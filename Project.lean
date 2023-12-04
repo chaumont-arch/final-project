@@ -3,6 +3,8 @@ import Mathlib.Tactic
 import Mathlib.Algebra.Lie.Basic
 import Mathlib.RingTheory.GradedAlgebra.Basic
 import Mathlib.LinearAlgebra.TensorAlgebra.Basic
+import Mathlib.Algebra.RingQuot
+import Mathlib.Algebra.Lie.UniversalEnveloping
 --import Mathlib.Algebra.DirectSum.Decomposition
 --import Mathlib.Algebra.Module.GradedModule
 --import Mathlib
@@ -28,7 +30,7 @@ structure FilteredAlgebra (R : Type*) (A : Type*)
 (complete' : ∀ x, ∃ i, x ∈ to_fun i)
 (map_add' : ∀ n m, to_fun (n + m) = to_fun n * to_fun m)
 
-/-
+--/-
 theorem graded_implies_filtered {R : Type*} {A : Type*}
 [CommSemiring R] [Semiring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] : FilteredAlgebra R A where
@@ -37,12 +39,15 @@ theorem graded_implies_filtered {R : Type*} {A : Type*}
   complete' := sorry
   map_add' := sorry
 
+--probably actually an instance of a function
 theorem filtered_from_graded (R : Type*) (A : Type*)
 [CommSemiring R] [Semiring A] [Algebra R A] (F : FilteredAlgebra R A) :
 GradedAlgebra (ℕ → Submodule R A) := by
 sorry
 --/
 
+
+--Our second step is to set up the idea of a symmetric algebra.
 
 --Largely taken from
 --https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Lie/UniversalEnveloping.html#UniversalEnvelopingAlgebra
@@ -71,12 +76,28 @@ namespace SymmetricAlgebra
 instance instInhabited : Inhabited (SymmetricAlgebra R L) :=
   inferInstanceAs (Inhabited (RingQuot (SymmetricAlgebra.Rel R L)))
 
-instance instRing : Ring (SymmetricAlgebra R L) := by
-  --inferInstanceAs (Ring (RingQuot (SymmetricAlgebra.Rel R L)))
-
+--/-
+instance instRing : Semiring (SymmetricAlgebra R L) :=
+  inferInstanceAs (Semiring (RingQuot (SymmetricAlgebra.Rel R L)))
 
 instance instAlgebra : Algebra R (SymmetricAlgebra R L) :=
   inferInstanceAs (Algebra R (RingQuot (SymmetricAlgebra.Rel R L)))
-
+--/
 
 end SymmetricAlgebra
+
+
+
+
+--END GOAL:
+--construct an isomorphism from the filtration on gr(U(g)) to S(g)
+--by filter
+--maybe show ∀ (n : ℕ), gr(U(g)) n ≅ S(g) n
+--on the grading functions
+
+/-
+theorem PBW {R : Type u} {L : Type v}
+  [CommRing R] [LieRing L] [g : LieAlgebra R L]
+  : filtered_from_graded UniversalEnvelopingAlgebra g = SymmetricAlgebra g
+  := sorry
+-/

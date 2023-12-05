@@ -24,24 +24,42 @@ import Mathlib.Algebra.Lie.UniversalEnveloping
 --Should I pull the function out?
 
 structure FilteredAlgebra (R : Type*) (A : Type*)
-[CommSemiring R] [Semiring A] [Algebra R A] :=
-(to_fun : ℕ → Submodule R A)
-(mono' : Monotone to_fun)
-(complete' : ∀ x, ∃ i, x ∈ to_fun i)
-(map_add' : ∀ n m, to_fun (n + m) = to_fun n * to_fun m)
+[CommRing R] [Ring A] [Algebra R A] :=
+(toFun : ℕ → Submodule R A)
+(mono' : Monotone toFun)
+(complete' : ∀ x, ∃ i, x ∈ toFun i)
+(mapAdd' : ∀ n m, toFun (n + m) = toFun n * toFun m)
+
+--coefun
+
+instance directSumExpansion {R : Type*} {A : Type*}
+[CommRing R] [Ring A] [Algebra R A]
+(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
+DirectSum (Fin (n+1)) (fun m => 𝒜 m) → DirectSum ℕ (fun m => 𝒜 m) := by
+  intro x
+  unfold DirectSum at *
+  rcases x with ⟨toFun, support'⟩
+  constructor
+  rotate_left
+  intro i
+  by_cases g : i > n
+  exact 0
+  simp at g
+  sorry
+  sorry
 
 --/-
 theorem graded_implies_filtered {R : Type*} {A : Type*}
-[CommSemiring R] [Semiring A] [Algebra R A]
+[CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] : FilteredAlgebra R A where
-  to_fun := sorry
+  toFun := fun n => sorry --(DirectSum (Fin (n+1)) (fun m => 𝒜 m))
   mono' := sorry
   complete' := sorry
-  map_add' := sorry
+  mapAdd' := sorry
 
 --probably actually an instance of a function
 theorem filtered_from_graded (R : Type*) (A : Type*)
-[CommSemiring R] [Semiring A] [Algebra R A] (F : FilteredAlgebra R A) :
+[CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) :
 GradedAlgebra (ℕ → Submodule R A) := by
 sorry
 --/
@@ -57,7 +75,7 @@ universe u₁ u₂
 
 variable (R : Type u₁) (L : Type u₂)
 
-variable [CommSemiring R] [AddCommMonoid L] [Module R L]
+variable [CommRing R] [AddCommMonoid L] [Module R L]
 
 local notation "ιₜ" => TensorAlgebra.ι R
 
@@ -77,8 +95,8 @@ instance instInhabited : Inhabited (SymmetricAlgebra R L) :=
   inferInstanceAs (Inhabited (RingQuot (SymmetricAlgebra.Rel R L)))
 
 --/-
-instance instRing : Semiring (SymmetricAlgebra R L) :=
-  inferInstanceAs (Semiring (RingQuot (SymmetricAlgebra.Rel R L)))
+instance instRing : Ring (SymmetricAlgebra R L) :=
+  inferInstanceAs (Ring (RingQuot (SymmetricAlgebra.Rel R L)))
 
 instance instAlgebra : Algebra R (SymmetricAlgebra R L) :=
   inferInstanceAs (Algebra R (RingQuot (SymmetricAlgebra.Rel R L)))

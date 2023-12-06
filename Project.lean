@@ -41,11 +41,19 @@ DirectSum (Fin (n+1)) (fun m => 𝒜 m) → DirectSum ℕ (fun m => 𝒜 m) := b
   rcases x with ⟨toFun, support'⟩
   constructor
   rotate_left
-  intro i
-  by_cases g : i > n
+  intro j
+  by_cases g : j > n
   exact 0
   simp at g
-  sorry
+  --have a : Fin (n+1) := {val := j, isLt := Nat.lt_succ.mpr g}
+  --have f := toFun a
+  have i := toFun {val := j, isLt := Nat.lt_succ.mpr g}
+  simp at i
+  simp
+  exact
+  --simp at f
+  --simp
+  --exact Fintype.lift 𝒜 (Fin.cast_le g) f
   sorry
 
 --/-

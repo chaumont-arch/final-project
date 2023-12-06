@@ -50,10 +50,11 @@ DirectSum (Fin (n+1)) (fun m => 𝒜 m) → DirectSum ℕ (fun m => 𝒜 m) := b
   have i := toFun {val := j, isLt := Nat.lt_succ.mpr g}
   simp at i
   simp
-  exact
+  exact i
   --simp at f
   --simp
   --exact Fintype.lift 𝒜 (Fin.cast_le g) f
+  simp
   sorry
 
 --/-

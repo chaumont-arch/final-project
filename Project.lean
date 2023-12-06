@@ -38,52 +38,66 @@ instance directSumExpansion {R : Type*} {A : Type*}
 DirectSum (Fin (n+1)) (fun m => 𝒜 m) → DirectSum ℕ (fun m => 𝒜 m) := by
   intro x
   unfold DirectSum at *
-  rcases x with ⟨toFun, support'⟩
+  rcases x with ⟨toFun', support'⟩
   constructor
   rotate_left
+
+  --we want to construct our function as follows:
+  --if the input natural is in Fin (n+1)
+  --eg is in [0,n], boundaries included
+  --then the output is given by the original (toFun')
+  --if not, it defaults to 0
+
   intro j
   by_cases g : j > n
   exact 0
   simp at g
-  --have a : Fin (n+1) := {val := j, isLt := Nat.lt_succ.mpr g}
-  --have f := toFun a
-  have i := toFun {val := j, isLt := Nat.lt_succ.mpr g}
+  have i := toFun' {val := j, isLt := Nat.lt_succ.mpr g}
   simp at i
   simp
   exact i
-  --simp at f
-  --simp
-  --exact Fintype.lift 𝒜 (Fin.cast_le g) f
   simp
   apply Trunc.mk
-  --refine Trunc.mk ?mk'.support'.a
+
   constructor
   rotate_left
-  exact Multiset.range n
+  exact Multiset.range (Nat.succ n)
   intro j
-  simp --alt?
-  --THINK FROM HERE
-  by_cases g : j < n
+  simp
+
+  by_cases g : j > n
+  rotate_left
   left
-  --simp
-  exact g
+  simp at g
+  cases g with
+  | refl => left; rfl
+  | step k => right; exact Nat.lt_succ.mpr k
+
   right
-  simp at *
   intro h
-  have k : j = n := by exact Nat.le_antisymm h g
-  --have k' := Nat.le_antisymm h g
-  symm at k
-  subst k
-  sorry
+  exfalso
+  have g' : ¬j > n := Nat.not_lt.mpr h
+  exact g' g
+
 
 --/-
 theorem graded_implies_filtered {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
-(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] : FilteredAlgebra R A where
+(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] : FilteredAlgebra R A := by
+  constructor
+  rotate_right
+  have s := fun n => DirectSum (Fin (n+1)) (fun m => 𝒜 m)
+  sorry
+  sorry
+  sorry
+  sorry
+  /-
+  where
   toFun := fun n => sorry --(DirectSum (Fin (n+1)) (fun m => 𝒜 m))
   mono' := sorry
   complete' := sorry
   mapAdd' := sorry
+  -/
 
 --probably actually an instance of a function
 theorem filtered_from_graded (R : Type*) (A : Type*)

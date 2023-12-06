@@ -55,6 +55,11 @@ DirectSum (Fin (n+1)) (fun m => 𝒜 m) → DirectSum ℕ (fun m => 𝒜 m) := b
   --simp
   --exact Fintype.lift 𝒜 (Fin.cast_le g) f
   simp
+  apply Trunc.mk
+  --refine Trunc.mk ?mk'.support'.a
+  constructor
+  rotate_left
+  exact Multiset.range n
   sorry
 
 --/-

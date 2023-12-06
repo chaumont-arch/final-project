@@ -60,6 +60,20 @@ DirectSum (Fin (n+1)) (fun m => 𝒜 m) → DirectSum ℕ (fun m => 𝒜 m) := b
   constructor
   rotate_left
   exact Multiset.range n
+  intro j
+  simp --alt?
+  --THINK FROM HERE
+  by_cases g : j < n
+  left
+  --simp
+  exact g
+  right
+  simp at *
+  intro h
+  have k : j = n := by exact Nat.le_antisymm h g
+  --have k' := Nat.le_antisymm h g
+  symm at k
+  subst k
   sorry
 
 --/-

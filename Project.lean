@@ -32,6 +32,16 @@ structure FilteredAlgebra (R : Type*) (A : Type*)
 
 --coefun
 
+--bad notation but whatevers
+def grade_ι {R : Type*} {A : Type*}
+[CommRing R] [Ring A] [Algebra R A]
+(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
+A →ₗ[R] A := {
+  toFun := sorry
+  map_add' := sorry
+  map_smul' := sorry
+}
+
 instance SumOfGradesInTotal {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
@@ -109,11 +119,7 @@ def ToFiltered {R : Type*} {A : Type*}
   constructor
   rotate_right
   have s := fun n => DirectSum (Fin (n+1)) (fun m => 𝒜 m)
-  --have s' := fun n => DirectSum (Fin (n+1)) (fun m => GradedAlgebra.proj 𝒜 m)
-  --have ss : (ℕ → _) := fun n => directSumExpansion 𝒜 s n
-  --(𝒜 : ℕ → Submodule ?m.32576 ?m.32577)
-  --(⨁ (m : Fin (?m.32575 + 1)), ↥(𝒜 ↑m))
-  --ℕ
+  have s' := fun (n : ℕ) => LinearMap.range (𝒜 R) ^ n
   sorry
   sorry
   sorry

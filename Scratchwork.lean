@@ -60,3 +60,23 @@ example {R : Type u} {L : Type v}
   GradedAlgebra _ ℕ R L _ := by
   sorry
 -/
+
+variable (R : Type*) [CommSemiring R]
+
+variable (M : Type*) [AddCommMonoid M] [Module R M]
+
+def ι' : M →ₗ[R] TensorAlgebra R M :=
+  { toFun := fun m => RingQuot.mkAlgHom R _ (FreeAlgebra.ι R m)
+    map_add' := fun x y => by
+      rw [← (RingQuot.mkAlgHom R (TensorAlgebra.Rel R M)).map_add]
+      exact RingQuot.mkAlgHom_rel R TensorAlgebra.Rel.add
+    map_smul' := fun r x => by
+      rw [← (RingQuot.mkAlgHom R (TensorAlgebra.Rel R M)).map_smul]
+      exact RingQuot.mkAlgHom_rel R TensorAlgebra.Rel.smul }
+
+--The tensor algebra of the module M over the commutative semiring R.
+--So the basis of M generates the TA, with R being for scalar mult.
+--This is a function from the basis to the algebra.
+
+--M →ₗ[R] DirectSum ℕ fun (i : ℕ) => ↥(LinearMap.range (TensorAlgebra.ι R) ^ i)
+--GradedAlgebra fun (x : ℕ) => LinearMap.range (TensorAlgebra.ι R) ^ x

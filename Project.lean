@@ -90,8 +90,16 @@ DirectSum (Fin (n+1)) (fun m => 𝒜 m) → A := by
   apply h
   exact f
 
+
+theorem filtrationSubmonoids {R : Type*} {A : Type*}
+[CommRing R] [Ring A] [Algebra R A]
+(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] (n : ℕ):
+Submonoid (filtrationImages 𝒜) := by
+
+sorry
+
 --/-
-theorem graded_implies_filtered {R : Type*} {A : Type*}
+def ToFiltered {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [i : GradedAlgebra 𝒜] : FilteredAlgebra R A := by
   constructor

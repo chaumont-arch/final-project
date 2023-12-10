@@ -32,7 +32,7 @@ structure FilteredAlgebra (R : Type*) (A : Type*)
 
 --coefun
 
-instance directSumExpansion {R : Type*} {A : Type*}
+instance SumOfGradesInTotal {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
 DirectSum (Fin (n+1)) (fun m => 𝒜 m) → DirectSum ℕ (fun m => 𝒜 m) := by
@@ -41,12 +41,6 @@ DirectSum (Fin (n+1)) (fun m => 𝒜 m) → DirectSum ℕ (fun m => 𝒜 m) := b
   rcases x with ⟨toFun', support'⟩
   constructor
   rotate_left
-
-  --we want to construct our function as follows:
-  --if the input natural is in Fin (n+1)
-  --eg is in [0,n], boundaries included
-  --then the output is given by the original (toFun')
-  --if not, it defaults to 0
 
   intro j
   by_cases g : j > n
@@ -79,23 +73,33 @@ DirectSum (Fin (n+1)) (fun m => 𝒜 m) → DirectSum ℕ (fun m => 𝒜 m) := b
   have g' : ¬j > n := Nat.not_lt.mpr h
   exact g' g
 
-theorem filtrationImages {R : Type*} {A : Type*}
+theorem SumOfGradesInAlgebra {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
 DirectSum (Fin (n+1)) (fun m => 𝒜 m) → A := by
   intro j
-  have f := directSumExpansion 𝒜 j
+  have f := SumOfGradesInTotal 𝒜 j
   have g := DirectSum.decomposeAlgEquiv 𝒜
   have h := g.invFun
   apply h
   exact f
 
+theorem ImageOfSumOfGrades {R : Type*} {A : Type*}
+[CommRing R] [Ring A] [Algebra R A]
+(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
+ℕ → Set A := by
+  intro n
+  have i := DirectSum (Fin (n+1)) (fun m => 𝒜 m)
+  --have j := SumOfGradesInTotal 𝒜 i
+  have k : DirectSum (Fin (n+1)) (fun m => 𝒜 m) → A
+    := SumOfGradesInAlgebra 𝒜
+  have l := k '' i
+  sorry
 
 theorem filtrationSubmonoids {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] (n : ℕ):
-Submonoid (filtrationImages 𝒜) := by
-
+Submonoid (ImageOfSumOfGrades n) := by
 sorry
 
 --/-
@@ -123,7 +127,7 @@ def ToFiltered {R : Type*} {A : Type*}
   -/
 
 --probably actually an instance of a function
-theorem filtered_from_graded (R : Type*) (A : Type*)
+theorem associatedGraded (R : Type*) (A : Type*)
 [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) :
 GradedAlgebra (ℕ → Submodule R A) := by
 sorry
@@ -159,13 +163,16 @@ namespace SymmetricAlgebra
 instance instInhabited : Inhabited (SymmetricAlgebra R L) :=
   inferInstanceAs (Inhabited (RingQuot (SymmetricAlgebra.Rel R L)))
 
---/-
 instance instRing : Ring (SymmetricAlgebra R L) :=
   inferInstanceAs (Ring (RingQuot (SymmetricAlgebra.Rel R L)))
 
 instance instAlgebra : Algebra R (SymmetricAlgebra R L) :=
   inferInstanceAs (Algebra R (RingQuot (SymmetricAlgebra.Rel R L)))
---/
+
+/-
+instance instGraded : GradedAlgebra (SymmetricAlgebra R L) :=
+  inferInstanceAs (GradedAlgebra (RingQuot (SymmetricAlgebra.Rel R L)))
+-/
 
 end SymmetricAlgebra
 

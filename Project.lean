@@ -33,14 +33,6 @@ structure FilteredAlgebra (R : Type*) (A : Type*)
 --coefun
 
 --bad notation but whatevers
-def grade_ι {R : Type*} {A : Type*}
-[CommRing R] [Ring A] [Algebra R A]
-(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
-A →ₗ[R] A := {
-  toFun := sorry
-  map_add' := sorry
-  map_smul' := sorry
-}
 
 instance SumOfGradesInTotal {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
@@ -94,26 +86,6 @@ DirectSum (Fin (n+1)) (fun m => 𝒜 m) → A := by
   apply h
   exact f
 
-instance summer {R : Type*} {A : Type*}
-[CommRing R] [Ring A] [Algebra R A]
-(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜]:
-(n : ℕ) → (Type u_2 : Type (u_2 + 1)) := by
-  intro n
-  exact DirectSum (Fin (n+1)) (fun m => 𝒜 m)
-
-theorem SumOfGradesInAlgebra' {R : Type*} {A : Type*}
-[CommRing R] [Ring A] [Algebra R A]
-(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
-summer →ₗ[R] A where
-  toFun := sorry
-  map_add' := sorry
-  map_smul' := sorry
-
-#check DirectSum.IsInternal
-#check DirectSum.isInternal_submodule_iff_independent_and_iSup_eq_top
-#check DirectSum.isInternal_submodule_iff_isCompl
-#check IsCompl
-
 --What does this get us?
 theorem InternalSum {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
@@ -121,43 +93,21 @@ theorem InternalSum {R : Type*} {A : Type*}
 DirectSum.IsInternal 𝒜 := by
 exact DirectSum.Decomposition.isInternal 𝒜
 
-
-
-theorem TITLETHIS {R : Type*} {A : Type*}
-[CommRing R] [Ring A] [Algebra R A]
-(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] (n : ℕ):
-(𝒜 n) →ₗ[R] A := {
-  toFun := by
-    have a : 𝒜 n → DirectSum (Fin (n+1)) (fun m => 𝒜 m) := by
-      sorry
-    have b : DirectSum (Fin (n+1)) (fun m => 𝒜 m) → A := by sorry
-    --this should be the canonical injection
-    --𝒜 m → ⊕ 𝒜 i → A
-    exact fun x => b (a x)
-  map_add' := by
-    intro x y
-    sorry
-  map_smul' := sorry
-}
-
-theorem ImageOfSumOfGrades {R : Type*} {A : Type*}
+theorem SumOfGradesInAlgebra' {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
-ℕ → Set A := by
-  intro n
-  have i := DirectSum (Fin (n+1)) (fun m => 𝒜 m)
-  --have j := SumOfGradesInTotal 𝒜 i
-  have k : DirectSum (Fin (n+1)) (fun m => 𝒜 m) → A
-    := SumOfGradesInAlgebra 𝒜
-  have l := k '' i
-  sorry
+DirectSum (Fin (n+1)) (fun m => 𝒜 m) →ₗ[R] A := sorry
+--timing out
 
-theorem filtrationSubmonoids {R : Type*} {A : Type*}
+#check DirectSum.lof
+
+theorem SumOfGradesInAlgebraAsSubmodule {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
-(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] (n : ℕ):
+(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] (n:ℕ) :
 Submodule R A := by
-
-sorry
+  let dec := DirectSum.Decomposition 𝒜
+  --let DSS := Submodule.span R (Set.range (DirectSum.toModule (fun i => ↥(𝒜 i)) n))
+  sorry
 
 --/-
 def ToFiltered {R : Type*} {A : Type*}
@@ -169,6 +119,7 @@ def ToFiltered {R : Type*} {A : Type*}
   --have s' := fun (n : ℕ) => LinearMap.range (𝒜 R) ^ n
   intro n
   have im := DirectSum (Fin (n+1)) (fun m => 𝒜 m)
+  have f := DirectSum.Decomposition 𝒜
   sorry
   sorry
   sorry
@@ -182,7 +133,7 @@ def ToFiltered {R : Type*} {A : Type*}
   -/
 
 --probably actually an instance of a function
-theorem associatedGraded (R : Type*) (A : Type*)
+theorem FilteredFromGraded (R : Type*) (A : Type*)
 [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) :
 GradedAlgebra (ℕ → Submodule R A) := by
 sorry

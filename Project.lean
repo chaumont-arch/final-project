@@ -217,6 +217,6 @@ end SymmetricAlgebra
 /-
 theorem PBW {R : Type u} {L : Type v}
   [CommRing R] [LieRing L] [g : LieAlgebra R L]
-  : filtered_from_graded UniversalEnvelopingAlgebra g = SymmetricAlgebra g
+  : FilteredFromGraded UniversalEnvelopingAlgebra g ≅ SymmetricAlgebra g
   := sorry
 -/

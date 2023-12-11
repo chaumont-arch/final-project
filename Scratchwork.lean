@@ -80,3 +80,10 @@ def ι' : M →ₗ[R] TensorAlgebra R M :=
 
 --M →ₗ[R] DirectSum ℕ fun (i : ℕ) => ↥(LinearMap.range (TensorAlgebra.ι R) ^ i)
 --GradedAlgebra fun (x : ℕ) => LinearMap.range (TensorAlgebra.ι R) ^ x
+
+--The algebra is graded by...
+
+
+--Plan for Submodule structure:
+--Use LinearMap.range on a →ₗ[R] function
+--Get that kind of function

@@ -94,6 +94,52 @@ DirectSum (Fin (n+1)) (fun m => 𝒜 m) → A := by
   apply h
   exact f
 
+instance summer {R : Type*} {A : Type*}
+[CommRing R] [Ring A] [Algebra R A]
+(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜]:
+(n : ℕ) → (Type u_2 : Type (u_2 + 1)) := by
+  intro n
+  exact DirectSum (Fin (n+1)) (fun m => 𝒜 m)
+
+theorem SumOfGradesInAlgebra' {R : Type*} {A : Type*}
+[CommRing R] [Ring A] [Algebra R A]
+(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
+summer →ₗ[R] A where
+  toFun := sorry
+  map_add' := sorry
+  map_smul' := sorry
+
+#check DirectSum.IsInternal
+#check DirectSum.isInternal_submodule_iff_independent_and_iSup_eq_top
+#check DirectSum.isInternal_submodule_iff_isCompl
+#check IsCompl
+
+--What does this get us?
+theorem InternalSum {R : Type*} {A : Type*}
+[CommRing R] [Ring A] [Algebra R A]
+(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜]:
+DirectSum.IsInternal 𝒜 := by
+exact DirectSum.Decomposition.isInternal 𝒜
+
+
+
+theorem TITLETHIS {R : Type*} {A : Type*}
+[CommRing R] [Ring A] [Algebra R A]
+(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] (n : ℕ):
+(𝒜 n) →ₗ[R] A := {
+  toFun := by
+    have a : 𝒜 n → DirectSum (Fin (n+1)) (fun m => 𝒜 m) := by
+      sorry
+    have b : DirectSum (Fin (n+1)) (fun m => 𝒜 m) → A := by sorry
+    --this should be the canonical injection
+    --𝒜 m → ⊕ 𝒜 i → A
+    exact fun x => b (a x)
+  map_add' := by
+    intro x y
+    sorry
+  map_smul' := sorry
+}
+
 theorem ImageOfSumOfGrades {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
@@ -109,7 +155,8 @@ theorem ImageOfSumOfGrades {R : Type*} {A : Type*}
 theorem filtrationSubmonoids {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] (n : ℕ):
-Submonoid (ImageOfSumOfGrades n) := by
+Submodule R A := by
+
 sorry
 
 --/-
@@ -118,8 +165,10 @@ def ToFiltered {R : Type*} {A : Type*}
 (𝒜 : ℕ → Submodule R A) [i : GradedAlgebra 𝒜] : FilteredAlgebra R A := by
   constructor
   rotate_right
-  have s := fun n => DirectSum (Fin (n+1)) (fun m => 𝒜 m)
-  have s' := fun (n : ℕ) => LinearMap.range (𝒜 R) ^ n
+  --have s := fun n => DirectSum (Fin (n+1)) (fun m => 𝒜 m)
+  --have s' := fun (n : ℕ) => LinearMap.range (𝒜 R) ^ n
+  intro n
+  have im := DirectSum (Fin (n+1)) (fun m => 𝒜 m)
   sorry
   sorry
   sorry

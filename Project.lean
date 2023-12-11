@@ -75,7 +75,7 @@ DirectSum (Fin (n+1)) (fun m => 𝒜 m) → DirectSum ℕ (fun m => 𝒜 m) := b
   have g' : ¬j > n := Nat.not_lt.mpr h
   exact g' g
 
-theorem SumOfGradesInAlgebra {R : Type*} {A : Type*}
+def SumOfGradesInAlgebra {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
 DirectSum (Fin (n+1)) (fun m => 𝒜 m) → A := by
@@ -93,20 +93,25 @@ theorem InternalSum {R : Type*} {A : Type*}
 DirectSum.IsInternal 𝒜 := by
 exact DirectSum.Decomposition.isInternal 𝒜
 
-theorem SumOfGradesInAlgebra' {R : Type*} {A : Type*}
+instance SumOfGradesInAlgebra' {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
-DirectSum (Fin (n+1)) (fun m => 𝒜 m) →ₗ[R] A := sorry
+DirectSum (Fin (n+1)) (fun m => 𝒜 m) →ₗ[R] A := {
+  toFun := SumOfGradesInAlgebra
+  map_add' := sorry
+  map_smul' := sorry
+}
 --timing out
 
 #check DirectSum.lof
 
 theorem SumOfGradesInAlgebraAsSubmodule {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
-(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] (n:ℕ) :
+(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] (n : ℕ) :
 Submodule R A := by
   let dec := DirectSum.Decomposition 𝒜
   --let DSS := Submodule.span R (Set.range (DirectSum.toModule (fun i => ↥(𝒜 i)) n))
+
   sorry
 
 --/-
@@ -132,12 +137,10 @@ def ToFiltered {R : Type*} {A : Type*}
   mapAdd' := sorry
   -/
 
---probably actually an instance of a function
-theorem FilteredFromGraded (R : Type*) (A : Type*)
+theorem FilteredFromGraded (R A : Type*)
 [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) :
-GradedAlgebra (ℕ → Submodule R A) := by
+GradedAlgebra := by
 sorry
---/
 
 
 --Our second step is to set up the idea of a symmetric algebra.
@@ -175,9 +178,29 @@ instance instRing : Ring (SymmetricAlgebra R L) :=
 instance instAlgebra : Algebra R (SymmetricAlgebra R L) :=
   inferInstanceAs (Algebra R (RingQuot (SymmetricAlgebra.Rel R L)))
 
+def SymmetricAlgebra.ι : L →ₗ[R] SymmetricAlgebra R L := {
+  toFun := fun m => RingQuot.mkAlgHom R _ (TensorAlgebra.ι R m)
+  map_add' := fun x y => by
+      rw [← (RingQuot.mkAlgHom R (Rel R L)).map_add]
+      exact RingQuot.mkAlgHom_rel R Rel.add
+  map_smul' := fun r x => by
+      rw [← (RingQuot.mkAlgHom R (Rel R L)).map_smul]
+      exact RingQuot.mkAlgHom_rel R Rel.smul }
+}
+
 /-
 instance instGraded : GradedAlgebra (SymmetricAlgebra R L) :=
   inferInstanceAs (GradedAlgebra (RingQuot (SymmetricAlgebra.Rel R L)))
+-/
+
+/-
+open scoped DirectSum
+
+variable {R M : Type*} [CommSemiring R] [AddCommMonoid M] [Module R M]
+
+nonrec def GradedAlgebra.ι : M →ₗ[R] ⨁ i : ℕ, ↥(LinearMap.range (ιₜ : M →ₗ[_] _) ^ i) :=
+  DirectSum.lof R ℕ (fun i => ↥(LinearMap.range (ιₜ R : M →ₗ[_] _) ^ i)) 1 ∘ₗ
+    (ι R).codRestrict _ fun m => by simpa only [pow_one] using LinearMap.mem_range_self _ m
 -/
 
 end SymmetricAlgebra

@@ -83,7 +83,6 @@ def ι' : M →ₗ[R] TensorAlgebra R M :=
 
 --The algebra is graded by...
 
-
 --Plan for Submodule structure:
 --Use LinearMap.range on a →ₗ[R] function
 --Get that kind of function

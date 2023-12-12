@@ -137,17 +137,19 @@ def ToFiltered {R : Type*} {A : Type*}
   mapAdd' := sorry
   -/
 
-theorem FilteredFromGraded (R A : Type*)
+theorem GradedFromFiltered (R A : Type*)
 [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) :
 GradedAlgebra (R := R) (A := A) (ι := ℕ) := by
 sorry
 
 
 --Our second step is to set up the idea of a symmetric algebra.
+--We also want to impose a grading structure on it.
 
 --Largely taken from
 --https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Lie/UniversalEnveloping.html#UniversalEnvelopingAlgebra
 --https://github.com/leanprover-community/mathlib4/blob/006b23a50533766ff9714eda094f2b6da8a9f513//Mathlib/Algebra/Lie/UniversalEnveloping.lean#L61-L62
+--and the existing code from TensorAlgebra.(Basic/Grading)
 
 universe u₁ u₂
 
@@ -228,7 +230,7 @@ nonrec def SymGradι : L →ₗ[R] ⨁ i : ℕ, ↥(LinearMap.range (ιₛ : L �
 
 
 --Is this even wrong?
-/-
+--/-
 theorem SymGradι_apply (m : L) :
     ιₛ m =
       DirectSum.of (fun (i : ℕ) => ↥(LinearMap.range (ιₛ : L →ₗ[_] _) ^ i)) 1
@@ -246,15 +248,14 @@ theorem sym_lift_ι_apply {A : Type*} [Semiring A] [Algebra R A] (f : L →ₗ[R
     symlift R f (ιₛ x) = f x := by
   conv_rhs => rw [← ι_comp_lift f]
 
-
-instance gradedAlgebraSym :
+instance gradedAlgebraSym [CommRing R] [Module R L]:
     GradedAlgebra ((LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ ·) : ℕ → Submodule R _) :=
   GradedAlgebra.ofAlgHom _ (symlift R <| SymGradι R L)
     (by
       ext m
       dsimp only [LinearMap.comp_apply, AlgHom.toLinearMap_apply, AlgHom.comp_apply,
         AlgHom.id_apply]
-      rw [lift_ι_apply, SymGradι_apply R L, DirectSum.coeAlgHom_of, Subtype.coe_mk])
+      rw [sym_lift_ι_apply, SymGradι_apply R L, DirectSum.coeAlgHom_of, Subtype.coe_mk])
     fun i x => by
     cases' x with x hx
     dsimp only [Subtype.coe_mk, DirectSum.lof_eq_of]
@@ -266,13 +267,16 @@ instance gradedAlgebraSym :
       rw [AlgHom.map_add, ihx, ihy, ← map_add]; rfl
     | hmul m hm i x hx ih =>
       obtain ⟨_, rfl⟩ := hm
-      rw [AlgHom.map_mul, ih, lift_ι_apply, SymGradι_apply R L, DirectSum.of_mul_of]
+      rw [AlgHom.map_mul, ih, sym_lift_ι_apply, SymGradι_apply R L, DirectSum.of_mul_of]
       exact DirectSum.of_eq_of_gradedMonoid_eq (Sigma.subtype_ext (add_comm _ _) rfl)
 
 end SymmetricAlgebra
 
+instance fileredUniversal (R : Type*) (L : Type*)
+[CommRing R] [Ring L] [LieRing L] [g : LieAlgebra R L] :
+FilteredAlgebra R L := {
 
-
+}
 
 --END GOAL:
 --construct an isomorphism from the filtration on gr(U(g)) to S(g)
@@ -283,12 +287,15 @@ end SymmetricAlgebra
 /-
 theorem PBW {R : Type u} {L : Type v}
   [CommRing R] [LieRing L] [g : LieAlgebra R L]
-  : FilteredFromGraded UniversalEnvelopingAlgebra g ≅ SymmetricAlgebra g
+  : GradedFromFiltered UniversalEnvelopingAlgebra g ≅ SymmetricAlgebra g
   := sorry
 -/
 
 namespace Theorem
 
-
+theorem PBW {R : Type u} {L : Type v}
+  [CommRing R] [LieRing L] [g : LieAlgebra R L]
+  : GradedUniversalEnvelopingAlgebra g ≅ SymmetricAlgebra R L
+  := sorry
 
 end Theorem

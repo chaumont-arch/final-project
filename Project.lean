@@ -139,7 +139,7 @@ def ToFiltered {R : Type*} {A : Type*}
 
 theorem FilteredFromGraded (R A : Type*)
 [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) :
-GradedAlgebra := by
+GradedAlgebra (R := R) (A := A) (ι := ℕ) := by
 sorry
 
 
@@ -182,11 +182,16 @@ def SymmetricAlgebra.ι : L →ₗ[R] SymmetricAlgebra R L := {
   toFun := fun m => RingQuot.mkAlgHom R _ (TensorAlgebra.ι R m)
   map_add' := fun x y => by
       rw [← (RingQuot.mkAlgHom R (Rel R L)).map_add]
-      exact RingQuot.mkAlgHom_rel R Rel.add
+      refine AlgHom.congr_arg (RingQuot.mkAlgHom R (Rel R L)) ?h
+      exact LinearMap.map_add ιₜ x y
+      --exact RingQuot.mkAlgHom_rel R Rel.add
   map_smul' := fun r x => by
       rw [← (RingQuot.mkAlgHom R (Rel R L)).map_smul]
-      exact RingQuot.mkAlgHom_rel R Rel.smul }
+      --exact RingQuot.mkAlgHom_rel R Rel.smul
+      refine FunLike.congr_arg (RingQuot.mkAlgHom R (Rel R L)) ?h₂
+      exact LinearMap.map_smul ιₜ r x
 }
+
 
 /-
 instance instGraded : GradedAlgebra (SymmetricAlgebra R L) :=
@@ -220,3 +225,9 @@ theorem PBW {R : Type u} {L : Type v}
   : FilteredFromGraded UniversalEnvelopingAlgebra g ≅ SymmetricAlgebra g
   := sorry
 -/
+
+namespace Theorem
+
+
+
+end Theorem

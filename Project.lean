@@ -178,7 +178,7 @@ instance instRing : Ring (SymmetricAlgebra R L) :=
 instance instAlgebra : Algebra R (SymmetricAlgebra R L) :=
   inferInstanceAs (Algebra R (RingQuot (SymmetricAlgebra.Rel R L)))
 
-def SymmetricAlgebra.ι : L →ₗ[R] SymmetricAlgebra R L := {
+def symmetricι : L →ₗ[R] SymmetricAlgebra R L := {
   toFun := fun m => RingQuot.mkAlgHom R _ (TensorAlgebra.ι R m)
   map_add' := fun x y => by
       rw [← (RingQuot.mkAlgHom R (Rel R L)).map_add]
@@ -192,21 +192,15 @@ def SymmetricAlgebra.ι : L →ₗ[R] SymmetricAlgebra R L := {
       exact LinearMap.map_smul ιₜ r x
 }
 
+--variable {R M : Type*} [CommRing R] [AddCommMonoid M] [Module R M]
 
-/-
-instance instGraded : GradedAlgebra (SymmetricAlgebra R L) :=
-  inferInstanceAs (GradedAlgebra (RingQuot (SymmetricAlgebra.Rel R L)))
--/
-
-/-
 open scoped DirectSum
 
-variable {R M : Type*} [CommSemiring R] [AddCommMonoid M] [Module R M]
+local notation "ιₛ" => symmetricι R L
 
-nonrec def GradedAlgebra.ι : M →ₗ[R] ⨁ i : ℕ, ↥(LinearMap.range (ιₜ : M →ₗ[_] _) ^ i) :=
-  DirectSum.lof R ℕ (fun i => ↥(LinearMap.range (ιₜ R : M →ₗ[_] _) ^ i)) 1 ∘ₗ
-    (ι R).codRestrict _ fun m => by simpa only [pow_one] using LinearMap.mem_range_self _ m
--/
+nonrec def SymGradι : L →ₗ[R] ⨁ i : ℕ, ↥(LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ i) :=
+  DirectSum.lof R ℕ (fun i => ↥(LinearMap.range (ιₛ : L →ₗ[_] _) ^ i)) 1 ∘ₗ
+    (ιₛ).codRestrict _ fun m => by simpa only [pow_one] using LinearMap.mem_range_self _ m
 
 end SymmetricAlgebra
 

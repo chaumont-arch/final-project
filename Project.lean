@@ -178,6 +178,7 @@ instance instRing : Ring (SymmetricAlgebra R L) :=
 instance instAlgebra : Algebra R (SymmetricAlgebra R L) :=
   inferInstanceAs (Algebra R (RingQuot (SymmetricAlgebra.Rel R L)))
 
+--The canonical injection of L into Symmetric R L
 def symmetricι : L →ₗ[R] SymmetricAlgebra R L := {
   toFun := fun m => RingQuot.mkAlgHom R _ (TensorAlgebra.ι R m)
   map_add' := fun x y => by
@@ -191,16 +192,82 @@ def symmetricι : L →ₗ[R] SymmetricAlgebra R L := {
       refine FunLike.congr_arg (RingQuot.mkAlgHom R (Rel R L)) ?h₂
       exact LinearMap.map_smul ιₜ r x
 }
-
---variable {R M : Type*} [CommRing R] [AddCommMonoid M] [Module R M]
-
 open scoped DirectSum
 
 local notation "ιₛ" => symmetricι R L
 
+theorem ringQuot_mkAlgHom_tensorAlgebra_ι_eq_ι (m : L) :
+    RingQuot.mkAlgHom R (Rel R L) (TensorAlgebra.ι R m) = ιₛ m := by
+  rw [symmetricι]
+  rfl
+
+--@[simps symm_apply]
+def symlift {A : Type*} [Semiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (SymmetricAlgebra R L →ₐ[R] A) :=
+  { toFun :=
+      RingQuot.liftAlgHom R ∘ fun f =>
+        ⟨TensorAlgebra.lift R f, fun x y (h : Rel R L x y) => by
+          induction h <;>
+            simp only [Algebra.smul_def, TensorAlgebra.lift_ι_apply, LinearMap.map_smulₛₗ, RingHom.id_apply, map_mul, AlgHom.commutes, map_add];
+            exact?%
+            ⟩
+    invFun := fun F => F.toLinearMap.comp (ιₛ)
+    left_inv := fun f => by
+      rw [symmetricι]
+      ext1 x
+      exact (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (TensorAlgebra.lift_ι_apply f x)
+    right_inv := fun F =>
+      RingQuot.ringQuot_ext' _ _ _ <|
+        FreeAlgebra.hom_ext <|
+          funext fun x => by
+            refine congrArg (↑?_ ∘ FreeAlgebra.ι ?_) rfl}
+
+--The same canonical injection, but into the grading structure
 nonrec def SymGradι : L →ₗ[R] ⨁ i : ℕ, ↥(LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ i) :=
   DirectSum.lof R ℕ (fun i => ↥(LinearMap.range (ιₛ : L →ₗ[_] _) ^ i)) 1 ∘ₗ
     (ιₛ).codRestrict _ fun m => by simpa only [pow_one] using LinearMap.mem_range_self _ m
+
+
+--Is this even wrong?
+/-
+theorem SymGradι_apply (m : L) :
+    ιₛ m =
+      DirectSum.of (fun (i : ℕ) => ↥(LinearMap.range (ιₛ : L →ₗ[_] _) ^ i)) 1
+        ⟨TensorAlgebra.ι R m, by simpa only [pow_one] using LinearMap.mem_range_self _ m⟩ :=
+  rfl
+--/
+
+@[simp]
+theorem sym_ι_comp_lift {A : Type*} [Semiring A] [Algebra R A] (f : L →ₗ[R] A) :
+    (symlift R f).toLinearMap.comp ιₛ = f := by
+  convert (symlift R).symm_apply_apply f
+
+@[simp]
+theorem sym_lift_ι_apply {A : Type*} [Semiring A] [Algebra R A] (f : L →ₗ[R] A) (x) :
+    symlift R f (ιₛ x) = f x := by
+  conv_rhs => rw [← ι_comp_lift f]
+
+
+instance gradedAlgebraSym :
+    GradedAlgebra ((LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ ·) : ℕ → Submodule R _) :=
+  GradedAlgebra.ofAlgHom _ (symlift R <| SymGradι R L)
+    (by
+      ext m
+      dsimp only [LinearMap.comp_apply, AlgHom.toLinearMap_apply, AlgHom.comp_apply,
+        AlgHom.id_apply]
+      rw [lift_ι_apply, SymGradι_apply R L, DirectSum.coeAlgHom_of, Subtype.coe_mk])
+    fun i x => by
+    cases' x with x hx
+    dsimp only [Subtype.coe_mk, DirectSum.lof_eq_of]
+    -- porting note: use new `induction using` support that failed in Lean 3
+    induction hx using Submodule.pow_induction_on_left' with
+    | hr r =>
+      rw [AlgHom.commutes, DirectSum.algebraMap_apply]; rfl
+    | hadd x y i hx hy ihx ihy =>
+      rw [AlgHom.map_add, ihx, ihy, ← map_add]; rfl
+    | hmul m hm i x hx ih =>
+      obtain ⟨_, rfl⟩ := hm
+      rw [AlgHom.map_mul, ih, lift_ι_apply, SymGradι_apply R L, DirectSum.of_mul_of]
+      exact DirectSum.of_eq_of_gradedMonoid_eq (Sigma.subtype_ext (add_comm _ _) rfl)
 
 end SymmetricAlgebra
 

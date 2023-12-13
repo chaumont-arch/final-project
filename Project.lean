@@ -217,7 +217,14 @@ def symlift {A : Type*} [Semiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (Symmet
       rw [symmetricι]
       ext1 x
       exact (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (TensorAlgebra.lift_ι_apply f x)
-    right_inv :=
+    right_inv :=fun F =>
+      RingQuot.ringQuot_ext' _ _ _ <|
+        TensorAlgebra.hom_ext <|
+          funext fun x => by
+            rw [symmetricι]
+            exact
+              (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (TensorAlgebra.lift_ι_apply _ _) }
+
     /-
     fun F =>
       RingQuot.ringQuot_ext' _ _ _ <|
@@ -226,14 +233,10 @@ def symlift {A : Type*} [Semiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (Symmet
             sorry
             --refine congrArg (↑?_ ∘ FreeAlgebra.ι ?_) rfl}
     --/
-    by
-      intro x
-      refine (AlgHom.ext ?H).symm
-      intro y
-      refine AlgHom.congr_fun ?H.H y
-      simp
-      refine AlgHom.ext ?H.H.H
-      intro z
+    --by
+      --intro x
+      --simp only [funext, TensorAlgebra.hom_ext, RingQuot.ringQuot_ext']
+
 
     }
 

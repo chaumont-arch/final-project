@@ -231,6 +231,9 @@ def symlift {A : Type*} [Semiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (Symmet
       refine (AlgHom.ext ?H).symm
       intro y
       refine AlgHom.congr_fun ?H.H y
+      simp
+      refine AlgHom.ext ?H.H.H
+      intro z
 
     }
 

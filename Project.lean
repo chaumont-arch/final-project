@@ -93,6 +93,7 @@ theorem InternalSum {R : Type*} {A : Type*}
 DirectSum.IsInternal 𝒜 := by
 exact DirectSum.Decomposition.isInternal 𝒜
 
+/-
 instance SumOfGradesInAlgebra' {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
@@ -101,9 +102,20 @@ DirectSum (Fin (n+1)) (fun m => 𝒜 m) →ₗ[R] A := {
   map_add' := sorry
   map_smul' := sorry
 }
+-/
 --timing out
 
+def SumOfGradesInAlgebra' {R : Type*} {A : Type*}
+[CommRing R] [Ring A] [Algebra R A]
+(𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
+DirectSum (Fin (n+1)) (fun m => 𝒜 m) →ₗ[R] A :=
+  DirectSum.toModule R (Fin (n+1)) A _
+
+#check Submodule.subtype
+
 #check DirectSum.lof
+
+#check DirectSum.toModule
 
 theorem SumOfGradesInAlgebraAsSubmodule {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
@@ -180,6 +192,10 @@ instance instRing : Ring (SymmetricAlgebra R L) :=
 instance instAlgebra : Algebra R (SymmetricAlgebra R L) :=
   inferInstanceAs (Algebra R (RingQuot (SymmetricAlgebra.Rel R L)))
 
+--AlgHom a
+--Define the map from tensor to symmetric
+
+
 --The canonical injection of L into Symmetric R L
 def symmetricι : L →ₗ[R] SymmetricAlgebra R L := {
   toFun := fun m => RingQuot.mkAlgHom R _ (TensorAlgebra.ι R m)
@@ -204,7 +220,7 @@ theorem ringQuot_mkAlgHom_tensorAlgebra_ι_eq_ι (m : L) :
   rfl
 
 --@[simps symm_apply]
-def symlift {A : Type*} [Semiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (SymmetricAlgebra R L →ₐ[R] A) :=
+def symlift {A : Type*} [CommSemiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (SymmetricAlgebra R L →ₐ[R] A) :=
   { toFun :=
       RingQuot.liftAlgHom R ∘ fun f =>
         ⟨TensorAlgebra.lift R f, fun x y (h : Rel R L x y) => by
@@ -237,11 +253,10 @@ def symlift {A : Type*} [Semiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (Symmet
       --intro x
       --simp only [funext, TensorAlgebra.hom_ext, RingQuot.ringQuot_ext']
 
-
     }
 
 --The same canonical injection, but into the grading structure
-nonrec def SymGradι : L →ₗ[R] ⨁ i : ℕ, ↥(LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ i) :=
+nonrec def SymGradι : L →ₗ[R] ⨁ i : ℕ, ↥((LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L)) ^ i) :=
   DirectSum.lof R ℕ (fun i => ↥(LinearMap.range (ιₛ : L →ₗ[_] _) ^ i)) 1 ∘ₗ
     (ιₛ).codRestrict _ fun m => by simpa only [pow_one] using LinearMap.mem_range_self _ m
 
@@ -249,10 +264,11 @@ nonrec def SymGradι : L →ₗ[R] ⨁ i : ℕ, ↥(LinearMap.range (ιₛ : L �
 --Is this even wrong?
 --/-
 theorem SymGradι_apply (m : L) :
-    ιₛ m =
-      DirectSum.of (fun (i : ℕ) => ↥(LinearMap.range (ιₛ : L →ₗ[_] _) ^ i)) 1
-        ⟨TensorAlgebra.ι R m, by simpa only [pow_one] using LinearMap.mem_range_self _ m⟩ :=
-  rfl
+    SymGradι R L m =
+      DirectSum.lof R ℕ (fun (i : ℕ) => ↥(LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ i)) 1
+        ⟨ιₛ m, sorry ⟩ := rfl
+        --by simpa only [pow_one] using LinearMap.mem_range_self _ m⟩ :=
+  --rfl
 --/
 
 @[simp]

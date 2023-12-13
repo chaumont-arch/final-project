@@ -210,18 +210,29 @@ def symlift {A : Type*} [Semiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (Symmet
         ⟨TensorAlgebra.lift R f, fun x y (h : Rel R L x y) => by
           induction h <;>
             simp only [Algebra.smul_def, TensorAlgebra.lift_ι_apply, LinearMap.map_smulₛₗ, RingHom.id_apply, map_mul, AlgHom.commutes, map_add];
-            exact?%
+            sorry
             ⟩
     invFun := fun F => F.toLinearMap.comp (ιₛ)
     left_inv := fun f => by
       rw [symmetricι]
       ext1 x
       exact (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (TensorAlgebra.lift_ι_apply f x)
-    right_inv := fun F =>
+    right_inv :=
+    /-
+    fun F =>
       RingQuot.ringQuot_ext' _ _ _ <|
-        FreeAlgebra.hom_ext <|
-          funext fun x => by
-            refine congrArg (↑?_ ∘ FreeAlgebra.ι ?_) rfl}
+        TensorAlgebra.hom_ext <|
+          funext fun x =>
+            sorry
+            --refine congrArg (↑?_ ∘ FreeAlgebra.ι ?_) rfl}
+    --/
+    by
+      intro x
+      refine (AlgHom.ext ?H).symm
+      intro y
+      refine AlgHom.congr_fun ?H.H y
+
+    }
 
 --The same canonical injection, but into the grading structure
 nonrec def SymGradι : L →ₗ[R] ⨁ i : ℕ, ↥(LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ i) :=
@@ -272,10 +283,14 @@ instance gradedAlgebraSym [CommRing R] [Module R L]:
 
 end SymmetricAlgebra
 
-instance fileredUniversal (R : Type*) (L : Type*)
-[CommRing R] [Ring L] [LieRing L] [g : LieAlgebra R L] :
+instance filteredUniversal (R : Type*) (L : Type*)
+[CommRing R] [Ring L] [LieRing L] [Algebra R L] [g : LieAlgebra R L] :
 FilteredAlgebra R L := {
-
+  toFun := by
+    sorry
+  mono' := sorry
+  complete' := sorry
+  mapAdd' := sorry
 }
 
 --END GOAL:

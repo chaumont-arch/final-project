@@ -86,3 +86,35 @@ def ι' : M →ₗ[R] TensorAlgebra R M :=
 --Plan for Submodule structure:
 --Use LinearMap.range on a →ₗ[R] function
 --Get that kind of function
+
+
+def lift' {A : Type*} [Semiring A] [Algebra R A] : (M →ₗ[R] A) ≃ (TensorAlgebra R M →ₐ[R] A) :=
+  { toFun :=
+      RingQuot.liftAlgHom R ∘ fun f =>
+        ⟨FreeAlgebra.lift R f, fun x y (h : TensorAlgebra.Rel R M x y) => by
+          induction h <;>
+            simp only [Algebra.smul_def, FreeAlgebra.lift_ι_apply, LinearMap.map_smulₛₗ,
+              RingHom.id_apply, map_mul, AlgHom.commutes, map_add]⟩
+    invFun := fun F => F.toLinearMap.comp (TensorAlgebra.ι R)
+    left_inv := fun f => by
+      rw [TensorAlgebra.ι]
+      ext1 x
+      exact (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (FreeAlgebra.lift_ι_apply f x)
+    right_inv := fun F =>
+      RingQuot.ringQuot_ext' _ _ _ <|
+        FreeAlgebra.hom_ext <|
+          funext fun x => by
+            rw [TensorAlgebra.ι]
+            exact
+              (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (FreeAlgebra.lift_ι_apply _ _) }
+
+example {R : Type u} {L : Type v}
+  [CommRing R] [LieRing L] [LieAlgebra R L] :
+  LieModule R L L := by
+  constructor
+  intro t x m
+  rw [← lie_skew, ← lie_skew x m, LieAlgebra.lie_smul, smul_neg] --not me at this point
+  intro t x m
+  apply lie_smul
+
+#check ℕ

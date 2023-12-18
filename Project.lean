@@ -223,7 +223,7 @@ theorem ringQuot_mkAlgHom_tensorAlgebra_ι_eq_ι (m : L) :
 def symlift {A : Type*} [CommSemiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (SymmetricAlgebra R L →ₐ[R] A) :=
   { toFun :=
       RingQuot.liftAlgHom R ∘ fun f =>
-        ⟨TensorAlgebra.lift R f, fun x y (h : Rel R L x y) => by
+        ⟨TensorAlgebra.lift R   f, fun x y (h : Rel R L x y) => by
           induction h <;>
             simp only [Algebra.smul_def, TensorAlgebra.lift_ι_apply, LinearMap.map_smulₛₗ, RingHom.id_apply, map_mul, AlgHom.commutes, map_add];
             exact mul_comm _ _
@@ -233,13 +233,20 @@ def symlift {A : Type*} [CommSemiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (Sy
       rw [symmetricι]
       ext1 x
       exact (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (TensorAlgebra.lift_ι_apply f x)
-    right_inv :=fun F =>
+    right_inv := fun F =>
       RingQuot.ringQuot_ext' _ _ _ <|
         TensorAlgebra.hom_ext <|
           funext fun x => by
             rw [symmetricι]
             exact
+              (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (TensorAlgebra.lift_ι_apply _ _)
+        }
+        /-
+          funext fun x => by
+            rw [symmetricι]
+            exact
               (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (TensorAlgebra.lift_ι_apply _ _) }
+        -/
 
 --The same canonical injection, but into the grading structure
 nonrec def SymGradι : L →ₗ[R] ⨁ i : ℕ, ↥((LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L)) ^ i) :=

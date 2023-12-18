@@ -226,7 +226,7 @@ def symlift {A : Type*} [CommSemiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (Sy
         ⟨TensorAlgebra.lift R f, fun x y (h : Rel R L x y) => by
           induction h <;>
             simp only [Algebra.smul_def, TensorAlgebra.lift_ι_apply, LinearMap.map_smulₛₗ, RingHom.id_apply, map_mul, AlgHom.commutes, map_add];
-            sorry
+            exact mul_comm _ _
             ⟩
     invFun := fun F => F.toLinearMap.comp (ιₛ)
     left_inv := fun f => by
@@ -240,20 +240,6 @@ def symlift {A : Type*} [CommSemiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (Sy
             rw [symmetricι]
             exact
               (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (TensorAlgebra.lift_ι_apply _ _) }
-
-    /-
-    fun F =>
-      RingQuot.ringQuot_ext' _ _ _ <|
-        TensorAlgebra.hom_ext <|
-          funext fun x =>
-            sorry
-            --refine congrArg (↑?_ ∘ FreeAlgebra.ι ?_) rfl}
-    --/
-    --by
-      --intro x
-      --simp only [funext, TensorAlgebra.hom_ext, RingQuot.ringQuot_ext']
-
-    }
 
 --The same canonical injection, but into the grading structure
 nonrec def SymGradι : L →ₗ[R] ⨁ i : ℕ, ↥((LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L)) ^ i) :=
@@ -331,8 +317,8 @@ theorem PBW {R : Type u} {L : Type v}
 namespace Theorem
 
 theorem PBW {R : Type u} {L : Type v}
-  [CommRing R] [LieRing L] [g : LieAlgebra R L]
-  : GradedUniversalEnvelopingAlgebra g ≅ SymmetricAlgebra R L
+  [CommRing R] [LieRing L] [LieAlgebra R L]
+  : GradedUniversalEnvelopingAlgebra R L ≅ SymmetricAlgebra R L
   := sorry
 
 end Theorem

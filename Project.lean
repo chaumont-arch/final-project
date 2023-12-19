@@ -270,7 +270,7 @@ theorem sym_ι_comp_lift {A : Type*} [CommSemiring A] [Algebra R A] (f : L →�
 @[simp]
 theorem sym_lift_ι_apply {A : Type*} [CommSemiring A] [Algebra R A] (f : L →ₗ[R] A) (x) :
     symlift R L f (ιₛ x) = f x := by
-  conv_rhs => rw [← sym_ι_comp_lift f]
+  conv_rhs => rw [← sym_ι_comp_lift R L f]
 
 instance gradedAlgebraSym [CommRing R] [Module R L]:
     GradedAlgebra ((LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ ·) : ℕ → Submodule R _) :=

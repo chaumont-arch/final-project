@@ -219,7 +219,7 @@ theorem ringQuot_mkAlgHom_tensorAlgebra_ι_eq_ι (m : L) :
   rw [symmetricι]
   rfl
 
---@[simps symm_apply]
+@[simps symm_apply]
 def symlift {A : Type*} [CommSemiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (SymmetricAlgebra R L →ₐ[R] A) :=
   { toFun :=
       RingQuot.liftAlgHom R ∘ fun f =>
@@ -258,15 +258,19 @@ theorem SymGradι_apply (m : L) :
   --rfl
 --/
 
-@[simp]
-theorem sym_ι_comp_lift {A : Type*} [Semiring A] [Algebra R A] (f : L →ₗ[R] A) :
-    (symlift R f).toLinearMap.comp ιₛ = f := by
-  convert (symlift R).symm_apply_apply f
+example {A : Type*} [CommSemiring A] [Algebra R A] (f : L →ₗ[R] A) :
+  SymmetricAlgebra R L →ₐ[R] A := by
+  exact symlift R L f
 
 @[simp]
-theorem sym_lift_ι_apply {A : Type*} [Semiring A] [Algebra R A] (f : L →ₗ[R] A) (x) :
-    symlift R f (ιₛ x) = f x := by
-  conv_rhs => rw [← ι_comp_lift f]
+theorem sym_ι_comp_lift {A : Type*} [CommSemiring A] [Algebra R A] (f : L →ₗ[R] A) :
+    (symlift R L f).toLinearMap.comp ιₛ = f := by
+  convert (symlift R L).symm_apply_apply f
+
+@[simp]
+theorem sym_lift_ι_apply {A : Type*} [CommSemiring A] [Algebra R A] (f : L →ₗ[R] A) (x) :
+    symlift R L f (ιₛ x) = f x := by
+  conv_rhs => rw [← sym_ι_comp_lift f]
 
 instance gradedAlgebraSym [CommRing R] [Module R L]:
     GradedAlgebra ((LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ ·) : ℕ → Submodule R _) :=

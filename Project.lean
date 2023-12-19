@@ -235,18 +235,9 @@ def symlift {A : Type*} [CommSemiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (Sy
       exact (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (TensorAlgebra.lift_ι_apply f x)
     right_inv := fun F =>
       RingQuot.ringQuot_ext' _ _ _ <|
-        TensorAlgebra.hom_ext <| funext fun x =>
+        TensorAlgebra.hom_ext <|
+          funext fun x =>
           sorry}
-          --(RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (FreeAlgebra.lift_ι_apply _ _)
-          /-
-          funext fun x => by
-            rw [symmetricι]
-            exact
-              (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (TensorAlgebra.lift_ι_apply F x) }-/
-
-    --why can't we use symmetricι?
-    --why doesn't ⇑ work?
-
       /-
       RingQuot.ringQuot_ext' _ _ _ <|
         TensorAlgebra.hom_ext <| --val should be ↑f

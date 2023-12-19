@@ -223,7 +223,7 @@ theorem ringQuot_mkAlgHom_tensorAlgebra_ι_eq_ι (m : L) :
 def symlift {A : Type*} [CommSemiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (SymmetricAlgebra R L →ₐ[R] A) :=
   { toFun :=
       RingQuot.liftAlgHom R ∘ fun f =>
-        ⟨TensorAlgebra.lift R   f, fun x y (h : Rel R L x y) => by
+        ⟨TensorAlgebra.lift R (↑f), fun x y (h : Rel R L x y) => by
           induction h <;>
             simp only [Algebra.smul_def, TensorAlgebra.lift_ι_apply, LinearMap.map_smulₛₗ, RingHom.id_apply, map_mul, AlgHom.commutes, map_add];
             exact mul_comm _ _
@@ -236,14 +236,30 @@ def symlift {A : Type*} [CommSemiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (Sy
     right_inv := fun F => by
       rw [symmetricι]
       ext1 x
-      --exact (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (TensorAlgebra.lift_ι_apply F x)
-      --TensorAlgebra.lift_ι_apply.{u_3, u_2, u_1} {R : Type u_1}
-      --[inst✝ : CommSemiring R] {M : Type u_2}
-      --[inst✝¹ : AddCommMonoid M]
-      --[inst✝² : Module R M] {A : Type u_3} [inst✝³ : Semiring A] [inst✝⁴ : Algebra R A]
-      --(f : M →ₗ[R] A) (x : M) : ↑(↑(TensorAlgebra.lift R) f) (↑ιₜ x) = ↑f x
+      --simp only [RingQuot.ringQuot_ext']
+      --simp only [TensorAlgebra.hom_ext]
+      --simp only [TensorAlgebra.lift_ι_apply]
+      --simp only [RingQuot.liftAlgHom_mkAlgHom_apply]
+      --simp only [RingQuot.ringQuot_ext', TensorAlgebra.hom_ext, RingQuot.liftAlgHom_mkAlgHom_apply, TensorAlgebra.lift_ι_apply]
+
+      simp
+      refine LinearMap.mem_eqLocus.mp ?H.a
+      --cases?
+
       sorry
     }
+
+    --why can't we use symmetricι?
+    --why doesn't ⇑ work?
+
+      /-
+      RingQuot.ringQuot_ext' _ _ _ <|
+        TensorAlgebra.hom_ext <| --val should be ↑f
+          funext fun x => by
+            rw [symmetricι]
+            exact
+              (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (TensorAlgebra.lift_ι_apply F x) }
+      -/
 
 --The same canonical injection, but into the grading structure
 nonrec def SymGradι : L →ₗ[R] ⨁ i : ℕ, ↥((LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L)) ^ i) :=

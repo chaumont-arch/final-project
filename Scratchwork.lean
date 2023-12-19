@@ -91,7 +91,7 @@ def ι' : M →ₗ[R] TensorAlgebra R M :=
 def lift' {A : Type*} [Semiring A] [Algebra R A] : (M →ₗ[R] A) ≃ (TensorAlgebra R M →ₐ[R] A) :=
   { toFun :=
       RingQuot.liftAlgHom R ∘ fun f =>
-        ⟨FreeAlgebra.lift R f, fun x y (h : TensorAlgebra.Rel R M x y) => by
+        ⟨FreeAlgebra.lift R (⇑f), fun x y (h : TensorAlgebra.Rel R M x y) => by
           induction h <;>
             simp only [Algebra.smul_def, FreeAlgebra.lift_ι_apply, LinearMap.map_smulₛₗ,
               RingHom.id_apply, map_mul, AlgHom.commutes, map_add]⟩
@@ -102,8 +102,8 @@ def lift' {A : Type*} [Semiring A] [Algebra R A] : (M →ₗ[R] A) ≃ (TensorAl
       exact (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (FreeAlgebra.lift_ι_apply f x)
     right_inv := fun F =>
       RingQuot.ringQuot_ext' _ _ _ <|
-        FreeAlgebra.hom_ext <|
-          funext fun x => by
+        FreeAlgebra.hom_ext <| --val := ↑(FreeAlgebra.lift R) ↑f
+          funext fun x => by 
             rw [TensorAlgebra.ι]
             exact
               (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (FreeAlgebra.lift_ι_apply _ _) }

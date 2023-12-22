@@ -272,9 +272,30 @@ theorem sym_lift_ι_apply {A : Type*} [CommSemiring A] [Algebra R A] (f : L →�
     symlift R L f (ιₛ x) = f x := by
   conv_rhs => rw [← sym_ι_comp_lift R L f]
 
+#check GradedAlgebra.ofAlgHom
+--  AddMonoid ι := ℕ
+--  CommSemiring R
+--  Semiring A (:= L?)
+--* 𝒜: ι → Submodule R A
+--* decompose : A →ₐ[R] ⨁ (i : ι), ↥(𝒜 i)
+
+#check symlift
+-- CommRing R
+-- AddCommMonoid L
+-- CommSemiring A (what is this?)
+--: Module R L, Algebra R A
+--the issue is here somewhere?
+--I think symlift is missing its A
+--No, A is SymGradι R L
+
+#check SymGradι
+-- CommRing R
+-- AddCommMonoid L
+--gotta be safe
+
 instance gradedAlgebraSym [CommRing R] [Module R L]:
     GradedAlgebra ((LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ ·) : ℕ → Submodule R _) :=
-  GradedAlgebra.ofAlgHom _ (symlift R <| SymGradι R L)
+  GradedAlgebra.ofAlgHom _ (symlift R L <| SymGradι R L)
     (by
       ext m
       dsimp only [LinearMap.comp_apply, AlgHom.toLinearMap_apply, AlgHom.comp_apply,
@@ -320,6 +341,9 @@ theorem PBW {R : Type u} {L : Type v}
 -/
 
 namespace Theorem
+
+--the ≅ is probably not right/sufficient
+--but it doesnt matter since im not going to get there
 
 theorem PBW {R : Type u} {L : Type v}
   [CommRing R] [LieRing L] [LieAlgebra R L]

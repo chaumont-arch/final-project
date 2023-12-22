@@ -163,11 +163,9 @@ sorry
 --https://github.com/leanprover-community/mathlib4/blob/006b23a50533766ff9714eda094f2b6da8a9f513//Mathlib/Algebra/Lie/UniversalEnveloping.lean#L61-L62
 --and the existing code from TensorAlgebra.(Basic/Grading)
 
-universe u₁ u₂
+variable (R : Type*) [CommRing R]
 
-variable (R : Type u₁) (L : Type u₂)
-
-variable [CommRing R] [AddCommMonoid L] [Module R L]
+variable (L : Type*) [AddCommMonoid L] [Module R L]
 
 local notation "ιₜ" => TensorAlgebra.ι R
 
@@ -195,6 +193,7 @@ instance instAlgebra : Algebra R (SymmetricAlgebra R L) :=
 --AlgHom a
 --Define the map from tensor to symmetric
 
+variable {L}
 
 --The canonical injection of L into Symmetric R L
 def symmetricι : L →ₗ[R] SymmetricAlgebra R L := {
@@ -212,7 +211,7 @@ def symmetricι : L →ₗ[R] SymmetricAlgebra R L := {
 }
 open scoped DirectSum
 
-local notation "ιₛ" => symmetricι R L
+local notation "ιₛ" => symmetricι R
 
 theorem ringQuot_mkAlgHom_tensorAlgebra_ι_eq_ι (m : L) :
     RingQuot.mkAlgHom R (Rel R L) (TensorAlgebra.ι R m) = ιₛ m := by
@@ -251,7 +250,7 @@ nonrec def SymGradι : L →ₗ[R] ⨁ i : ℕ, ↥((LinearMap.range (ιₛ : L 
 --Is this even wrong?
 --/-
 theorem SymGradι_apply (m : L) :
-    SymGradι R L m =
+    SymGradι R m =
       DirectSum.lof R ℕ (fun (i : ℕ) => ↥(LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ i)) 1
         ⟨ιₛ m, by simpa only [pow_one] using LinearMap.mem_range_self _ m ⟩ := rfl
         --by simpa only [pow_one] using LinearMap.mem_range_self _ m⟩ :=
@@ -260,17 +259,17 @@ theorem SymGradι_apply (m : L) :
 
 example {A : Type*} [CommSemiring A] [Algebra R A] (f : L →ₗ[R] A) :
   SymmetricAlgebra R L →ₐ[R] A := by
-  exact symlift R L f
+  exact symlift R f
 
 @[simp]
 theorem sym_ι_comp_lift {A : Type*} [CommSemiring A] [Algebra R A] (f : L →ₗ[R] A) :
-    (symlift R L f).toLinearMap.comp ιₛ = f := by
-  convert (symlift R L).symm_apply_apply f
+    (symlift R f).toLinearMap.comp ιₛ = f := by
+  convert (symlift R).symm_apply_apply f
 
 @[simp]
 theorem sym_lift_ι_apply {A : Type*} [CommSemiring A] [Algebra R A] (f : L →ₗ[R] A) (x) :
-    symlift R L f (ιₛ x) = f x := by
-  conv_rhs => rw [← sym_ι_comp_lift R L f]
+    symlift R f (ιₛ x) = f x := by
+  conv_rhs => rw [← sym_ι_comp_lift R f]
 
 #check GradedAlgebra.ofAlgHom
 --  AddMonoid ι := ℕ
@@ -293,6 +292,7 @@ theorem sym_lift_ι_apply {A : Type*} [CommSemiring A] [Algebra R A] (f : L →�
 -- CommRing R
 -- AddCommMonoid L
 --gotta be safe
+
 
 instance gradedAlgebraSym [CommRing R] [Module R L]:
     GradedAlgebra ((LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ ·) : ℕ → Submodule R _) :=

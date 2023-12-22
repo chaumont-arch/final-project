@@ -283,10 +283,11 @@ theorem sym_lift_ι_apply {A : Type*} [CommSemiring A] [Algebra R A] (f : L →�
 -- CommRing R
 -- AddCommMonoid L
 -- CommSemiring A (what is this?)
---: Module R L, Algebra R A
+-- : Module R L, Algebra R A
 --the issue is here somewhere?
 --I think symlift is missing its A
 --No, A is SymGradι R L
+-- L should be in {} and after
 
 #check SymGradι
 -- CommRing R
@@ -295,7 +296,7 @@ theorem sym_lift_ι_apply {A : Type*} [CommSemiring A] [Algebra R A] (f : L →�
 
 instance gradedAlgebraSym [CommRing R] [Module R L]:
     GradedAlgebra ((LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ ·) : ℕ → Submodule R _) :=
-  GradedAlgebra.ofAlgHom _ (symlift R L <| SymGradι R L)
+  GradedAlgebra.ofAlgHom _ (symlift R <| SymGradι R L)
     (by
       ext m
       dsimp only [LinearMap.comp_apply, AlgHom.toLinearMap_apply, AlgHom.comp_apply,

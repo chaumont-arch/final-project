@@ -103,7 +103,7 @@ def lift' {A : Type*} [Semiring A] [Algebra R A] : (M →ₗ[R] A) ≃ (TensorAl
     right_inv := fun F =>
       RingQuot.ringQuot_ext' _ _ _ <|
         FreeAlgebra.hom_ext <| --val := ↑(FreeAlgebra.lift R) ↑f
-          funext fun x => by 
+          funext fun x => by
             rw [TensorAlgebra.ι]
             exact
               (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (FreeAlgebra.lift_ι_apply _ _) }
@@ -118,3 +118,31 @@ example {R : Type u} {L : Type v}
   apply lie_smul
 
 #check ℕ
+
+#check TensorAlgebra.lift
+
+open scoped DirectSum
+
+#check GradedAlgebra.ι
+
+instance gradedAlgebra' :
+    GradedAlgebra ((LinearMap.range (TensorAlgebra.ι R : M →ₗ[R] TensorAlgebra R M) ^ ·) : ℕ → Submodule R _) :=
+  GradedAlgebra.ofAlgHom _ (TensorAlgebra.lift R <| GradedAlgebra.ι R M)
+    (by
+      ext m
+      dsimp only [LinearMap.comp_apply, AlgHom.toLinearMap_apply, AlgHom.comp_apply,
+        AlgHom.id_apply]
+      rw [TensorAlgebra.lift_ι_apply, GradedAlgebra.ι_apply R M, DirectSum.coeAlgHom_of, Subtype.coe_mk])
+    fun i x => by
+    cases' x with x hx
+    dsimp only [Subtype.coe_mk, DirectSum.lof_eq_of]
+    -- porting note: use new `induction using` support that failed in Lean 3
+    induction hx using Submodule.pow_induction_on_left' with
+    | hr r =>
+      rw [AlgHom.commutes, DirectSum.algebraMap_apply]; rfl
+    | hadd x y i hx hy ihx ihy =>
+      rw [AlgHom.map_add, ihx, ihy, ← map_add]; rfl
+    | hmul m hm i x hx ih =>
+      obtain ⟨_, rfl⟩ := hm
+      rw [AlgHom.map_mul, ih, TensorAlgebra.lift_ι_apply, GradedAlgebra.ι_apply R M, DirectSum.of_mul_of]
+      exact DirectSum.of_eq_of_gradedMonoid_eq (Sigma.subtype_ext (add_comm _ _) rfl)

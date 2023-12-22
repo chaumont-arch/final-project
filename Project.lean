@@ -9,7 +9,6 @@ import Mathlib.Algebra.Lie.UniversalEnveloping
 --import Mathlib.Algebra.Module.GradedModule
 --import Mathlib
 
-
 --https://leanprover-community.github.io/mathlib4_docs
 --Mathlib.Algebra.Lie.Basic: Lie Algebra
 --Mathlib.RingTheory.GradedAlgebra.Basic: Graded Algebra
@@ -21,8 +20,6 @@ import Mathlib.Algebra.Lie.UniversalEnveloping
 --Filtered Algebra code is based on code by Eric Wieser
 --https://github.com/pygae/lean-ga/blob/0947a6d21cf5a724732c29dabbc7f543edb66d4e/src/for_mathlib/algebra/filtration.lean
 
---Should I pull the function out?
-
 structure FilteredAlgebra (R : Type*) (A : Type*)
 [CommRing R] [Ring A] [Algebra R A] :=
 (toFun : ℕ → Submodule R A)
@@ -31,7 +28,10 @@ structure FilteredAlgebra (R : Type*) (A : Type*)
 (mapAdd' : ∀ n m, toFun (n + m) = toFun n * toFun m)
 
 
+--The following lines are me playing around with grading maps.
+--none of these ended up getting...
 
+--Here we manually construct the map from the first n+1 grades to the direct sum.
 instance SumOfGradesInTotal {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
@@ -73,6 +73,7 @@ DirectSum (Fin (n+1)) (fun m => 𝒜 m) → DirectSum ℕ (fun m => 𝒜 m) := b
   have g' : ¬j > n := Nat.not_lt.mpr h
   exact g' g
 
+--This composes the above with the isomorphism from the direct sum of every grade into the underlying algebra.
 def SumOfGradesInAlgebra {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
@@ -84,13 +85,14 @@ DirectSum (Fin (n+1)) (fun m => 𝒜 m) → A := by
   apply h
   exact f
 
---What does this get us?
+--This is just a proof of concept of DirectSum.IsInternal in a graded algebra.
 theorem InternalSum {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜]:
 DirectSum.IsInternal 𝒜 := by
 exact DirectSum.Decomposition.isInternal 𝒜
 
+--Showing that SumOfGradesInAlgebra is R-linear.
 instance SumOfGradesInAlgebra' {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
@@ -100,6 +102,7 @@ DirectSum (Fin (n+1)) (fun m => 𝒜 m) →ₗ[R] A := {
   map_smul' := sorry
 }
 
+--An alternate form of the above, for testing purposes.
 def SumOfGradesInAlgebra'' {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
@@ -115,16 +118,13 @@ Submodule R A := by
   sorry
 
 
+--Here we set up the conversions between graded and filtered algebras.
 
-
---/-
 def GradedToFiltered {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [i : GradedAlgebra 𝒜] : FilteredAlgebra R A := by
   constructor
   rotate_right
-  --have s := fun n => DirectSum (Fin (n+1)) (fun m => 𝒜 m)
-  --have s' := fun (n : ℕ) => LinearMap.range (𝒜 R) ^ n
   intro n
   have im := DirectSum (Fin (n+1)) (fun m => 𝒜 m)
   have f := DirectSum.Decomposition 𝒜
@@ -132,15 +132,8 @@ def GradedToFiltered {R : Type*} {A : Type*}
   sorry
   sorry
   sorry
-  /-
-  where
-  toFun := fun n => sorry --(DirectSum (Fin (n+1)) (fun m => 𝒜 m))
-  mono' := sorry
-  complete' := sorry
-  mapAdd' := sorry
-  -/
 
-def GradedFromFiltered (R A : Type*)
+def FilteredToGraded (R A : Type*)
 [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) :
 GradedAlgebra ((LinearMap.range (inject : A →ₗ[R] Algebra R A) ^ ·) : ℕ → Submodule R _) := by
 sorry
@@ -182,11 +175,12 @@ instance instAlgebra : Algebra R (SymmetricAlgebra R L) :=
   inferInstanceAs (Algebra R (RingQuot (SymmetricAlgebra.Rel R L)))
 
 
---Define the map from tensor to symmetric
+--With the basic constructions of the symmetric algebra set up, we give it a grading.
+--This is largely based on TensorAlgebra.Basic and TensorAlgebra.Grading.
 
 variable {L}
 
---The canonical injection of L into Symmetric R L
+--The canonical injection of L into Symmetric R L.
 def symmetricι : L →ₗ[R] SymmetricAlgebra R L := {
   toFun := fun m => RingQuot.mkAlgHom R _ (TensorAlgebra.ι R m)
   map_add' := fun x y => by
@@ -300,13 +294,6 @@ FilteredAlgebra R L := {
 --by filter
 --maybe show ∀ (n : ℕ), gr(U(g)) n ≅ S(g) n
 --on the grading functions
-
-/-
-theorem PBW {R : Type u} {L : Type v}
-  [CommRing R] [LieRing L] [g : LieAlgebra R L]
-  : GradedFromFiltered UniversalEnvelopingAlgebra g ≅ SymmetricAlgebra g
-  := sorry
--/
 
 namespace Theorem
 

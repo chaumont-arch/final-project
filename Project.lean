@@ -30,9 +30,7 @@ structure FilteredAlgebra (R : Type*) (A : Type*)
 (complete' : ∀ x, ∃ i, x ∈ toFun i)
 (mapAdd' : ∀ n m, toFun (n + m) = toFun n * toFun m)
 
---coefun
 
---bad notation but whatevers
 
 instance SumOfGradesInTotal {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
@@ -93,7 +91,6 @@ theorem InternalSum {R : Type*} {A : Type*}
 DirectSum.IsInternal 𝒜 := by
 exact DirectSum.Decomposition.isInternal 𝒜
 
-/-
 instance SumOfGradesInAlgebra' {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
@@ -102,20 +99,12 @@ DirectSum (Fin (n+1)) (fun m => 𝒜 m) →ₗ[R] A := {
   map_add' := sorry
   map_smul' := sorry
 }
--/
---timing out
 
-def SumOfGradesInAlgebra' {R : Type*} {A : Type*}
+def SumOfGradesInAlgebra'' {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [GradedAlgebra 𝒜] :
 DirectSum (Fin (n+1)) (fun m => 𝒜 m) →ₗ[R] A :=
   DirectSum.toModule R (Fin (n+1)) A _
-
-#check Submodule.subtype
-
-#check DirectSum.lof
-
-#check DirectSum.toModule
 
 theorem SumOfGradesInAlgebraAsSubmodule {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
@@ -123,11 +112,13 @@ theorem SumOfGradesInAlgebraAsSubmodule {R : Type*} {A : Type*}
 Submodule R A := by
   let dec := DirectSum.Decomposition 𝒜
   --let DSS := Submodule.span R (Set.range (DirectSum.toModule (fun i => ↥(𝒜 i)) n))
-
   sorry
 
+
+
+
 --/-
-def ToFiltered {R : Type*} {A : Type*}
+def GradedToFiltered {R : Type*} {A : Type*}
 [CommRing R] [Ring A] [Algebra R A]
 (𝒜 : ℕ → Submodule R A) [i : GradedAlgebra 𝒜] : FilteredAlgebra R A := by
   constructor
@@ -149,9 +140,9 @@ def ToFiltered {R : Type*} {A : Type*}
   mapAdd' := sorry
   -/
 
-theorem GradedFromFiltered (R A : Type*)
+def GradedFromFiltered (R A : Type*)
 [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) :
-GradedAlgebra (R := R) (A := A) (ι := ℕ) := by
+GradedAlgebra ((LinearMap.range (inject : A →ₗ[R] Algebra R A) ^ ·) : ℕ → Submodule R _) := by
 sorry
 
 
@@ -190,7 +181,7 @@ instance instRing : Ring (SymmetricAlgebra R L) :=
 instance instAlgebra : Algebra R (SymmetricAlgebra R L) :=
   inferInstanceAs (Algebra R (RingQuot (SymmetricAlgebra.Rel R L)))
 
---AlgHom a
+
 --Define the map from tensor to symmetric
 
 variable {L}
@@ -202,10 +193,8 @@ def symmetricι : L →ₗ[R] SymmetricAlgebra R L := {
       rw [← (RingQuot.mkAlgHom R (Rel R L)).map_add]
       refine AlgHom.congr_arg (RingQuot.mkAlgHom R (Rel R L)) ?h
       exact LinearMap.map_add ιₜ x y
-      --exact RingQuot.mkAlgHom_rel R Rel.add
   map_smul' := fun r x => by
       rw [← (RingQuot.mkAlgHom R (Rel R L)).map_smul]
-      --exact RingQuot.mkAlgHom_rel R Rel.smul
       refine FunLike.congr_arg (RingQuot.mkAlgHom R (Rel R L)) ?h₂
       exact LinearMap.map_smul ιₜ r x
 }
@@ -247,15 +236,11 @@ nonrec def SymGradι : L →ₗ[R] ⨁ i : ℕ, ↥((LinearMap.range (ιₛ : L 
     (ιₛ).codRestrict _ fun m => by simpa only [pow_one] using LinearMap.mem_range_self _ m
 
 
---Is this even wrong?
---/-
 theorem SymGradι_apply (m : L) :
     SymGradι R m =
       DirectSum.lof R ℕ (fun (i : ℕ) => ↥(LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ i)) 1
         ⟨ιₛ m, by simpa only [pow_one] using LinearMap.mem_range_self _ m ⟩ := rfl
-        --by simpa only [pow_one] using LinearMap.mem_range_self _ m⟩ :=
-  --rfl
---/
+
 
 example {A : Type*} [CommSemiring A] [Algebra R A] (f : L →ₗ[R] A) :
   SymmetricAlgebra R L →ₐ[R] A := by
@@ -272,31 +257,13 @@ theorem sym_lift_ι_apply {A : Type*} [CommSemiring A] [Algebra R A] (f : L →�
   conv_rhs => rw [← sym_ι_comp_lift R f]
 
 #check GradedAlgebra.ofAlgHom
---  AddMonoid ι := ℕ
---  CommSemiring R
---  Semiring A (:= L?)
---* 𝒜: ι → Submodule R A
---* decompose : A →ₐ[R] ⨁ (i : ι), ↥(𝒜 i)
-
 #check symlift
--- CommRing R
--- AddCommMonoid L
--- CommSemiring A (what is this?)
--- : Module R L, Algebra R A
---the issue is here somewhere?
---I think symlift is missing its A
---No, A is SymGradι R L
--- L should be in {} and after
-
 #check SymGradι
--- CommRing R
--- AddCommMonoid L
---gotta be safe
 
-
-instance gradedAlgebraSym [CommRing R] [Module R L]:
+instance gradedAlgebraSym  [CommRing R] [Module R L]:
     GradedAlgebra ((LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ ·) : ℕ → Submodule R _) :=
-  GradedAlgebra.ofAlgHom _ (symlift R <| SymGradι R L)
+  GradedAlgebra.ofAlgHom (LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ ·)
+    (symlift R <| SymGradι R L) --its a problem with symlift
     (by
       ext m
       dsimp only [LinearMap.comp_apply, AlgHom.toLinearMap_apply, AlgHom.comp_apply,

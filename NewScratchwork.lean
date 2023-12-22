@@ -37,6 +37,20 @@ theorem GradedAlgebra.ι_apply (m : M) :
 
 variable {R M}
 
+
+
+def foo : (n : Nat) → Fin n → Fin (n+1) := fun _ i => i.succ
+
+example (i : Fin 5) : Fin 6 := foo _ i
+
+--#check GradedAlgebra.ofAlgHom
+
+--the blank is:
+--(LinearMap.range (ι R : M →ₗ[R] TensorAlgebra R M) ^ ·)
+
+#check lift
+#check GradedAlgebra.ι
+
 /-- The tensor algebra is graded by the powers of the submodule `(TensorAlgebra.ι R).range`. -/
 instance gradedAlgebra :
     GradedAlgebra ((LinearMap.range (ι R : M →ₗ[R] TensorAlgebra R M) ^ ·) : ℕ → Submodule R _) :=
@@ -60,8 +74,8 @@ instance gradedAlgebra :
       rw [AlgHom.map_mul, ih, lift_ι_apply, GradedAlgebra.ι_apply R M, DirectSum.of_mul_of]
       exact DirectSum.of_eq_of_gradedMonoid_eq (Sigma.subtype_ext (add_comm _ _) rfl)
 
-#check lift
+--#check lift
 
-#check gradedAlgebra
+--#check gradedAlgebra
 
 end TensorAlgebra

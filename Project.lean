@@ -268,7 +268,7 @@ theorem sym_lift_ι_apply {A : Type*} [CommSemiring A] [Algebra R A] (f : L →�
 #check CommSemiring --CommMonoid, Semiring
 #check Ring --Semiring, AddCommGroup, AddGroupWithOne
 
-#check symlift R (L := L) (A := SymmetricAlgebra R L) --(L →ₗ[R] A) ≃ (SymmetricAlgebra R L →ₐ[R] A)
+#check symlift R (L := L) (A := LinearMap.range (SymGradι R (L := L))) --(L →ₗ[R] A) ≃ (SymmetricAlgebra R L →ₐ[R] A)
 #check SymGradι R (L := L) --L →ₗ[R] ⨁ (i : ℕ), ↥(LinearMap.range ιₛ ^ i)
 #check symlift R (L := L) <| (SymGradι R (L := L))
 

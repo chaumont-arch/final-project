@@ -174,6 +174,11 @@ instance instRing : Ring (SymmetricAlgebra R L) :=
 instance instAlgebra : Algebra R (SymmetricAlgebra R L) :=
   inferInstanceAs (Algebra R (RingQuot (SymmetricAlgebra.Rel R L)))
 
+instance instMonoid : CommMonoid (SymmetricAlgebra R L) :=
+  inferInstanceAs (CommMonoid (RingQuot (SymmetricAlgebra.Rel R L)))
+
+--CommMonoid
+
 
 --With the basic constructions of the symmetric algebra set up, we give it a grading.
 --This is largely based on TensorAlgebra.Basic and TensorAlgebra.Grading.
@@ -259,15 +264,19 @@ theorem sym_lift_ι_apply {A : Type*} [CommSemiring A] [Algebra R A] (f : L →�
 #check symlift
 #check SymGradι
 
-#check symlift R --(L →ₗ[R] A) ≃ (SymmetricAlgebra R L →ₐ[R] A)
-#check SymGradι R L --L →ₗ[R] ⨁ (i : ℕ), ↥(LinearMap.range ιₛ ^ i)
-#check symlift R <| SymGradι R L
+#check SymmetricAlgebra R L
+#check CommSemiring --CommMonoid, Semiring
+#check Ring --Semiring, AddCommGroup, AddGroupWithOne
+
+#check symlift R (L := L) (A := SymmetricAlgebra R L) --(L →ₗ[R] A) ≃ (SymmetricAlgebra R L →ₐ[R] A)
+#check SymGradι R (L := L) --L →ₗ[R] ⨁ (i : ℕ), ↥(LinearMap.range ιₛ ^ i)
+#check symlift R (L := L) <| (SymGradι R (L := L))
 
 --Building the actual grading on the symmetric algebra.
 instance gradedAlgebraSym : --[CommRing R] [Module R L]:
     GradedAlgebra ((LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ ·) : ℕ → Submodule R _) :=
   GradedAlgebra.ofAlgHom (LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ ·)
-    (symlift R <| SymGradι R L) --its a problem with symlift?
+    (symlift R (L := L) <| SymGradι R (L := L)) --its a problem with symlift?
     (by
       ext m
       dsimp only [LinearMap.comp_apply, AlgHom.toLinearMap_apply, AlgHom.comp_apply,

@@ -181,6 +181,7 @@ instance instAlgebra : Algebra R (SymmetricAlgebra R L) :=
 variable {L}
 
 --The canonical injection of L into Symmetric R L.
+
 def symmetricι : L →ₗ[R] SymmetricAlgebra R L := {
   toFun := fun m => RingQuot.mkAlgHom R _ (TensorAlgebra.ι R m)
   map_add' := fun x y => by
@@ -192,6 +193,7 @@ def symmetricι : L →ₗ[R] SymmetricAlgebra R L := {
       refine FunLike.congr_arg (RingQuot.mkAlgHom R (Rel R L)) ?h₂
       exact LinearMap.map_smul ιₜ r x
 }
+
 open scoped DirectSum
 
 local notation "ιₛ" => symmetricι R
@@ -201,6 +203,7 @@ theorem ringQuot_mkAlgHom_tensorAlgebra_ι_eq_ι (m : L) :
   rw [symmetricι]
   rfl
 
+--This should probably be SymmetricLift but its too late to fix.
 @[simps symm_apply]
 def symlift {A : Type*} [CommSemiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (SymmetricAlgebra R L →ₐ[R] A) :=
   { toFun :=
@@ -224,27 +227,29 @@ def symlift {A : Type*} [CommSemiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (Sy
               (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (TensorAlgebra.lift_ι_apply _ _) }
 
 
---The same canonical injection, but into the grading structure
+--The same map as symmetricι, but interpreting "SymmetricAlgebra R L" as grades.
 nonrec def SymGradι : L →ₗ[R] ⨁ i : ℕ, ↥((LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L)) ^ i) :=
   DirectSum.lof R ℕ (fun i => ↥(LinearMap.range (ιₛ : L →ₗ[_] _) ^ i)) 1 ∘ₗ
     (ιₛ).codRestrict _ fun m => by simpa only [pow_one] using LinearMap.mem_range_self _ m
 
-
+--The explicit image of an element of L under the above.
 theorem SymGradι_apply (m : L) :
     SymGradι R m =
       DirectSum.lof R ℕ (fun (i : ℕ) => ↥(LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ i)) 1
         ⟨ιₛ m, by simpa only [pow_one] using LinearMap.mem_range_self _ m ⟩ := rfl
 
-
+--An example of what symlift looks like in practice.
 example {A : Type*} [CommSemiring A] [Algebra R A] (f : L →ₗ[R] A) :
   SymmetricAlgebra R L →ₐ[R] A := by
   exact symlift R f
 
+--Showing that the composition of the lift of f with the injection returns f.
 @[simp]
 theorem sym_ι_comp_lift {A : Type*} [CommSemiring A] [Algebra R A] (f : L →ₗ[R] A) :
     (symlift R f).toLinearMap.comp ιₛ = f := by
   convert (symlift R).symm_apply_apply f
 
+--As the above, but explicitly on an element.
 @[simp]
 theorem sym_lift_ι_apply {A : Type*} [CommSemiring A] [Algebra R A] (f : L →ₗ[R] A) (x) :
     symlift R f (ιₛ x) = f x := by
@@ -254,10 +259,15 @@ theorem sym_lift_ι_apply {A : Type*} [CommSemiring A] [Algebra R A] (f : L →�
 #check symlift
 #check SymGradι
 
-instance gradedAlgebraSym  [CommRing R] [Module R L]:
+#check symlift R --(L →ₗ[R] A) ≃ (SymmetricAlgebra R L →ₐ[R] A)
+#check SymGradι R L --L →ₗ[R] ⨁ (i : ℕ), ↥(LinearMap.range ιₛ ^ i)
+#check symlift R <| SymGradι R L
+
+--Building the actual grading on the symmetric algebra.
+instance gradedAlgebraSym : --[CommRing R] [Module R L]:
     GradedAlgebra ((LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ ·) : ℕ → Submodule R _) :=
   GradedAlgebra.ofAlgHom (LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ ·)
-    (symlift R <| SymGradι R L) --its a problem with symlift
+    (symlift R <| SymGradι R L) --its a problem with symlift?
     (by
       ext m
       dsimp only [LinearMap.comp_apply, AlgHom.toLinearMap_apply, AlgHom.comp_apply,

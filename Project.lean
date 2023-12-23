@@ -126,7 +126,7 @@ example {R M : Type*} [Ring R] [AddCommGroup M] [Module R M]
   (H L : Submodule R M) : Submodule R L :=
   Submodule.comap L.subtype H
 
-def ComponentGrading {R A : Type*} [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) : ℕ → Type
+def ComponentGrading {R A : Type*} [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) : ℕ → Type _
   | 0 => F.toFun 0
   | n+1 => F.toFun (n+1) / ((F.toFun n).comap (F.toFun (n+1)).subtype)
 

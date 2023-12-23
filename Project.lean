@@ -152,6 +152,7 @@ def GradingFunction {R A : Type*} [CommRing R] [Ring A] [Algebra R A] (F : Filte
       have + DirectSum.lof R ℕ (ComponentGrading F) _
     LinearMap.range i
 
+
 --Here we set up the conversions between graded and filtered algebras.
 
 def GradedToFiltered {R : Type*} {A : Type*}

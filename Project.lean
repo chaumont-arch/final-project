@@ -119,21 +119,38 @@ Submodule R A := by
 
 --We have some constructions for the filtration to graded.
 
+--Note: I decided to add these all in last minute, so none of them are going to compile.
+--Hopefully the ideas here make some sort of sense, though.
+
 example {R M : Type*} [Ring R] [AddCommGroup M] [Module R M]
   (H L : Submodule R M) : Submodule R L :=
   Submodule.comap L.subtype H
 
-def componentGrading {R A : Type*} [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) :
-    ℕ → Type
-    | 0 => F.toFun 0
-    | n+1 => F.toFun (n+1) / ((F.toFun n).comap (F.toFun (n+1)).subtype)
+def ComponentGrading {R A : Type*} [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) : ℕ → Type
+  | 0 => F.toFun 0
+  | n+1 => F.toFun (n+1) / ((F.toFun n).comap (F.toFun (n+1)).subtype)
 
 instance {R A : Type*} [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) (n : ℕ) :
-    AddCommGroup (componentGrading F n) :=
+    AddCommGroup (ComponentGrading F n) :=
   match n with
     | 0 => show AddCommGroup (F.toFun 0) from inferInstance
     | n+1 => show AddCommGroup F.toFun (n+1) / ((F.toFun n).comap (F.toFun (n+1)).subtype) from inferInstance
 
+def BuildingGraded {R A : Type*} [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) :
+  Type _ := DirectSum ℕ (ComponentGrading F)
+
+instance {R A : Type*} [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) :
+  Ring R (BuildingGraded F) := sorry
+
+instance {R A : Type*} [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) :
+  Algebra R (BuildingGraded F) := sorry
+
+def GradingFunction {R A : Type*} [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) :
+    ℕ → Submodule R (BuildingGraded F) :=
+  fun n =>
+    let i : (ComponentGrading F) n →ₗ[R] BuildingGraded F := by
+      have + DirectSum.lof R ℕ (ComponentGrading F) _
+    LinearMap.range i
 
 --Here we set up the conversions between graded and filtered algebras.
 

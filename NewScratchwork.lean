@@ -51,6 +51,10 @@ example (i : Fin 5) : Fin 6 := foo _ i
 #check lift
 #check GradedAlgebra.ι
 
+#check lift R
+#check GradedAlgebra.ι R M --M →ₗ[R] ⨁ (i : ℕ), ↥(LinearMap.range (ι R) ^ i)
+#check lift R <| GradedAlgebra.ι R M
+
 /-- The tensor algebra is graded by the powers of the submodule `(TensorAlgebra.ι R).range`. -/
 instance gradedAlgebra :
     GradedAlgebra ((LinearMap.range (ι R : M →ₗ[R] TensorAlgebra R M) ^ ·) : ℕ → Submodule R _) :=

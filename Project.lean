@@ -5,15 +5,6 @@ import Mathlib.RingTheory.GradedAlgebra.Basic
 import Mathlib.LinearAlgebra.TensorAlgebra.Basic
 import Mathlib.Algebra.RingQuot
 import Mathlib.Algebra.Lie.UniversalEnveloping
---import Mathlib.Algebra.DirectSum.Decomposition
---import Mathlib.Algebra.Module.GradedModule
---import Mathlib
-
---https://leanprover-community.github.io/mathlib4_docs
---Mathlib.Algebra.Lie.Basic: Lie Algebra
---Mathlib.RingTheory.GradedAlgebra.Basic: Graded Algebra
---Mathlib.LinearAlgebra.TensorAlgebra.Basic: Tensor Algebra
---Mathlib.Algebra.Lie.UniversalEnveloping: Universal Enveloping Algebra
 
 --Our first step is to set up the idea of a filtered algebra.
 
@@ -29,7 +20,7 @@ structure FilteredAlgebra (R : Type*) (A : Type*)
 
 
 --The following lines are me playing around with grading maps.
---none of these ended up getting...
+--none of these ended up getting me exactly where i wanted.
 
 --Here we manually construct the map from the first n+1 grades to the direct sum.
 instance SumOfGradesInTotal {R : Type*} {A : Type*}
@@ -302,10 +293,10 @@ theorem sym_lift_ι_apply {A : Type*} [CommSemiring A] [Algebra R A] (f : L →�
 --  [inst_3 : CommSemiring A] →
 --    [inst_4 : Algebra R A]
 
-#check SymmetricAlgebra R L
-#check CommSemiring --CommMonoid, Semiring
-#check Ring --Semiring, AddCommGroup, AddGroupWithOne
-
+--There's an issue below in that (symlift R (L := L) <| SymGradι R L) in gradedAlgebraSym is timing out.
+--I think (?) the issue here is that the image of SymGradι isn't necessarily a CommSemiring/Algebra?
+--  (given that it's serving as A in symlift)
+--I don't see how the Tensor Algebra would be completing though, if that was the issue.
 #check symlift R (L := L) --(L →ₗ[R] _) ≃ (SymmetricAlgebra R L →ₐ[R] _)
 #check SymGradι R (L := L) --L →ₗ[R] ⨁ (i : ℕ), ↥(LinearMap.range ιₛ ^ i)
 #check symlift R (L := L) <| (SymGradι R (L := L))

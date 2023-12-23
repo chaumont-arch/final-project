@@ -10,7 +10,7 @@ The universal enveloping algebra is used to understand representations of a give
 
 Thus, if we can understand the structure of the universal enveloping algebra, we can understand the structure of representations of its Lie algebra. The Poincare-Birkhoff-Witt theorem essentially states that the vector space structure of the universal enveloping algebra of a Lie algebra is isomorphic to the vector space structure of the symmetric algebra of a Lie algebra, with the two only differing by their algebra products. This isomorphism is constructed on the filtrations of these structures, where the nth filtration consists of the submodule of elements whose terms are the tensors of at most n elements.
 
-(give sources, and word better)
+(I don't know which sources to site, given that I pulled this all off the top of my head?)
 
 ## Definitions
 
@@ -30,10 +30,8 @@ The Poincare-Birkhoff-Witt theorem states that the graded algebra associated to 
 
 # Lean File Structure / Constructions and Theorems Formalized
 
-The file starts with formalizing the Filtered algebra, and attempts to build the conversions between filtered algebras and graded algebras. 
+The file starts with formalizing the filtered algebra, and attempts to build the conversions between filtered algebras and graded algebras. The filtered algebra is on 14-19. The conversions are on 154-170, with associated constructions on lines 26-150.
 
-We then define the symmetric algebra, and build the descended grading on it directly. 
+We then define the symmetric algebra, and build the descended grading on it directly. The algebra itself is constructed on lines 189-195, with structures imposed on lines 199-206. The grading is done from lines 216-326. 
 
-Finally, we begin defining the filtration on the universal enveloping algebra.
-
-# Constructions and Theorems Formalized
+Finally, we begin defining the filtration on the universal enveloping algebra. It is "done" on lines 330-338, although there's not really anything there.

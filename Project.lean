@@ -273,7 +273,7 @@ theorem sym_lift_ι_apply {A : Type*} [CommSemiring A] [Algebra R A] (f : L →�
 instance gradedAlgebraSym : --[CommRing R] [Module R L]:
     GradedAlgebra ((LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ ·) : ℕ → Submodule R _) :=
   GradedAlgebra.ofAlgHom (LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L) ^ ·)
-    (symlift R (L := L) <| SymGradι R (L := L)) --its a problem with symlift?
+    (symlift R (L := L) <| SymGradι R L) --its a problem with symlift?
     (by
       ext m
       dsimp only [LinearMap.comp_apply, AlgHom.toLinearMap_apply, AlgHom.comp_apply,

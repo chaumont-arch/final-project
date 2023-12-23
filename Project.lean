@@ -117,6 +117,19 @@ Submodule R A := by
   --let DSS := Submodule.span R (Set.range (DirectSum.toModule (fun i => ↥(𝒜 i)) n))
   sorry
 
+--We have some constructions for the filtration to graded.
+
+example {R M : Type*} [Ring R] [AddCommGroup M] [Module R M]
+  (M L : Submodule R M) : Submodule R L :=
+  Submodule.comap L.subtype M --probably comap?
+
+def componentGrading {R A : Type*} [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) :
+    Type _ :=
+  DirectSum ℕ fun n =>
+    match n with
+    | 0 => F.toFun 0
+    | n+1 => F.toFun (n+1) / ((F.toFun n).comap (F.toFun (n+1)).subtype)
+
 
 --Here we set up the conversions between graded and filtered algebras.
 
@@ -174,8 +187,6 @@ instance instRing : Ring (SymmetricAlgebra R L) :=
 instance instAlgebra : Algebra R (SymmetricAlgebra R L) :=
   inferInstanceAs (Algebra R (RingQuot (SymmetricAlgebra.Rel R L)))
 
---CommMonoid
-
 
 --With the basic constructions of the symmetric algebra set up, we give it a grading.
 --This is largely based on TensorAlgebra.Basic and TensorAlgebra.Grading.
@@ -228,7 +239,6 @@ def symlift {A : Type*} [CommSemiring A] [Algebra R A] : (L →ₗ[R] A) ≃ (Sy
             exact
               (RingQuot.liftAlgHom_mkAlgHom_apply _ _ _ _).trans (TensorAlgebra.lift_ι_apply _ _) }
 
-
 --The same map as symmetricι, but interpreting "SymmetricAlgebra R L" as grades.
 nonrec def SymGradι : L →ₗ[R] ⨁ i : ℕ, ↥((LinearMap.range (ιₛ : L →ₗ[R] SymmetricAlgebra R L)) ^ i) :=
   DirectSum.lof R ℕ (fun i => ↥(LinearMap.range (ιₛ : L →ₗ[_] _) ^ i)) 1 ∘ₗ
@@ -261,13 +271,17 @@ theorem sym_lift_ι_apply {A : Type*} [CommSemiring A] [Algebra R A] (f : L →�
 #check symlift
 #check SymGradι
 
+--{A : Type u_3} →
+--  [inst_3 : CommSemiring A] →
+--    [inst_4 : Algebra R A]
+
 #check SymmetricAlgebra R L
 #check CommSemiring --CommMonoid, Semiring
 #check Ring --Semiring, AddCommGroup, AddGroupWithOne
 
-#check symlift R --(L →ₗ[R] _) ≃ (SymmetricAlgebra R L →ₐ[R] _)
+#check symlift R (L := L) --(L →ₗ[R] _) ≃ (SymmetricAlgebra R L →ₐ[R] _)
 #check SymGradι R (L := L) --L →ₗ[R] ⨁ (i : ℕ), ↥(LinearMap.range ιₛ ^ i)
-#check symlift R <| (SymGradι R (L := L))
+#check symlift R (L := L) <| (SymGradι R (L := L))
 
 --Building the actual grading on the symmetric algebra.
 instance gradedAlgebraSym : --[CommRing R] [Module R L]:

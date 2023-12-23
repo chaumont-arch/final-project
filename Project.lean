@@ -120,15 +120,19 @@ Submodule R A := by
 --We have some constructions for the filtration to graded.
 
 example {R M : Type*} [Ring R] [AddCommGroup M] [Module R M]
-  (M L : Submodule R M) : Submodule R L :=
-  Submodule.comap L.subtype M --probably comap?
+  (H L : Submodule R M) : Submodule R L :=
+  Submodule.comap L.subtype H
 
 def componentGrading {R A : Type*} [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) :
-    Type _ :=
-  DirectSum ℕ fun n =>
-    match n with
+    ℕ → Type
     | 0 => F.toFun 0
     | n+1 => F.toFun (n+1) / ((F.toFun n).comap (F.toFun (n+1)).subtype)
+
+instance {R A : Type*} [CommRing R] [Ring A] [Algebra R A] (F : FilteredAlgebra R A) (n : ℕ) :
+    AddCommGroup (componentGrading F n) :=
+  match n with
+    | 0 => show AddCommGroup (F.toFun 0) from inferInstance
+    | n+1 => show AddCommGroup F.toFun (n+1) / ((F.toFun n).comap (F.toFun (n+1)).subtype) from inferInstance
 
 
 --Here we set up the conversions between graded and filtered algebras.
